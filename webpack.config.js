@@ -3,6 +3,7 @@ var path = require('path');
 var webpack = require('webpack');
 
 // Webpack Plugins
+var CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 var autoprefixer = require('autoprefixer');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -36,19 +37,23 @@ module.exports = function makeWebpackConfig() {
 
   // add debug messages
   config.debug = !isProd;
-
-  /**
-   * Entry
-   * Reference: http://webpack.github.io/docs/configuration.html#entry
-   */
   config.entry = {
-    // our angular app
+    'blank': './src/js/sb-admin-2.js',
+    'buttons': './src/js/sb-admin-2.js',
+    'echarts': './src/js/sb-admin-2.js',
+    'ent-info': './src/js/sb-admin-2.js',
+    'forms': './src/js/sb-admin-2.js',
+    'grid': './src/js/sb-admin-2.js',
+    'icons': './src/js/sb-admin-2.js',
+    'index': './src/js/sb-admin-2.js',
+    'login': './src/js/sb-admin-2.js',
+    'notifications': './src/js/sb-admin-2.js',
+    'panels-wells': './src/js/sb-admin-2.js',
+    'tables': './src/js/sb-admin-2.js',
+    'typography': './src/js/sb-admin-2.js',
+    'app': './src/js/sb-admin-2.js',
+    'vendor': './src/js/vendor.js'
   };
-
-  /**
-   * Output
-   * Reference: http://webpack.github.io/docs/configuration.html#output
-   */
   config.output = {
     path: root('dist'),
     publicPath: isProd ? '/' : 'http://localhost:8080/',
@@ -64,8 +69,10 @@ module.exports = function makeWebpackConfig() {
     cache: true,
     root: root(),
     // only discover files that have those extensions
-    extensions: ['', '.css', '.scss'],
-    alias: {}
+    extensions: ['', '.js', '.json', '.css', '.scss'],
+    alias: {
+      'app': 'src/pages',
+    }
   };
 
   /**
@@ -77,6 +84,14 @@ module.exports = function makeWebpackConfig() {
   config.module = {
     preLoaders: [],
     loaders: [
+      {
+        test: /\.jsx?$/,
+        loader: 'babel',
+        include: root('src', 'js'),
+        query: {
+          presets: ['es2015']
+        }
+      },
       // support for .scss files
       // all css in src/style will be bundled in an external css file
       {
@@ -99,6 +114,84 @@ module.exports = function makeWebpackConfig() {
    * List: http://webpack.github.io/docs/list-of-plugins.html
    */
   config.plugins = [
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'blank.html'),
+      filename: 'blank.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'buttons.html'),
+      filename: 'buttons.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'echarts.html'),
+      filename: 'echarts.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'ent-info.html'),
+      filename: 'ent-info.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'forms.html'),
+      filename: 'forms.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'grid.html'),
+      filename: 'grid.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'icons.html'),
+      filename: 'icons.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'index.html'),
+      filename: 'index.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'login.html'),
+      filename: 'login.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'notifications.html'),
+      filename: 'notifications.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'panels.html'),
+      filename: 'panels.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'tables.html'),
+      filename: 'tables.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
+    new HtmlwebpackPlugin({
+      template: root('src/pages', 'typography.html'),
+      filename: 'typography.html',
+      chunks: ['app', 'vendors'],
+      inject: 'body'
+    }),
     // Define env variables to help with builds
     // Reference: https://webpack.github.io/docs/list-of-plugins.html#defineplugin
     new webpack.DefinePlugin({
@@ -108,14 +201,18 @@ module.exports = function makeWebpackConfig() {
       }
     }),
     new DashboardPlugin(),
+    new CommonsChunkPlugin({
+      name: ['vendor']
+    }),
     // Extract css files
     // Reference: https://github.com/webpack/extract-text-webpack-plugin
     // Disabled when in test mode or not in build mode
     new ExtractTextPlugin('css/[name].[hash].css', { disable: !isProd }),
-    //把指定文件夹下的文件复制到指定的目录
-    // new TransferWebpackPlugin([
-    //   { from: 'src' }
-    // ], root('dist'))
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery",
+      "window.jQuery": "jquery"
+    })
   ];
 
   // Add build specific plugins
@@ -166,10 +263,10 @@ module.exports = function makeWebpackConfig() {
    * Reference: http://webpack.github.io/docs/webpack-dev-server.html
    */
   config.devServer = {
-    contentBase: '.',
     historyApiFallback: true,
-    quiet: true,
-    stats: 'minimal' // none (or false), errors-only, minimal, normal (or true) and verbose
+    hot: true,
+    inline: true,
+    progress: true
   };
 
   return config;
