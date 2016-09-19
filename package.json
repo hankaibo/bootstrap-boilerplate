@@ -1,10 +1,19 @@
 {
   "name": "mybootstrap",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "An open source, admin dashboard template for Bootstrap.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rimraf node_modules dist && npm cache clean",
+    "clean-install": "npm run clean && npm install",
+    "clean-start": "npm run clean-install && npm start",
+    "watch": "webpack --watch --progress --profile",
+    "build": "rimraf dist && webpack --progress --profile --bail",
+    "server": "webpack-dashboard -- webpack-dev-server --inline --port 8080",
+    "webdriver-update": "webdriver-manager update",
+    "webdriver-start": "webdriver-manager start",
+    "start": "npm run server",
+    "postinstall": "npm run webdriver-update"
   },
   "repository": {
     "type": "git",
@@ -27,7 +36,22 @@
     "metismenu": "^2.5.2"
   },
   "devDependencies": {
+    "autoprefixer": "^6.3.2",
+    "codelyzer": "0.0.26",
+    "copy-webpack-plugin": "^3.0.0",
+    "css-loader": "^0.23.0",
     "eslint": "^3.3.1",
-    "eslint-config-google": "^0.6.0"
+    "eslint-config-google": "^0.6.0",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "node-sass": "^3.4.2",
+    "null-loader": "0.1.1",
+    "postcss-loader": "^0.9.1",
+    "rimraf": "^2.5.1",
+    "sass-loader": "^4.0.0",
+    "style-loader": "^0.13.0",
+    "url-loader": "^0.5.6",
+    "webpack": "^1.12.13",
+    "webpack-dashboard": "^0.1.8",
+    "webpack-dev-server": "^1.14.1"
   }
 }
