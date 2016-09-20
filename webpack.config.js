@@ -1,89 +1,120 @@
+/**
+ *@author:hankaibo
+ */
+
 var path = require('path');
+var glob = require('glob');
 var webpack = require('webpack');
-var node_modules_dir = path.resolve(__dirname, 'node_modules');
-var fs = require('fs');
+var helpers = require('./helpers');
 
-var HtmlWebpackPlugin=require('html-webpack-plugin');
+/*
+ * Webpack Plugins
+ */
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-module.exports = {
-  entry: {
-    app: path.resolve(__dirname, './src/js/entry.js'),
-    blank: path.resolve(__dirname, './src/js/blank.js'),
-    vendors: ['jquery', 'bootstrap']
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].[hash].js'
-  },
-  module: {
+/*
+ * Webpack Constants
+ */
+var ENV = process.env.npm_lifecycle_event;
+var isProd = ENV === 'build';
+
+module.exports = function makeWebpackConfig() {
+  var entries = getEntry('src/scripts/page/**/*.js', 'src/scripts/page/');
+  var chunks = Object.keys(entries);
+  var config = {};
+
+  if (isProd) {
+    config.devtool = 'source-map';
+  } else {
+    config.devtool = 'eval-source-map';
+  }
+  config.debug = !isProd;
+  config.entry = entries;
+  config.output = {
+    path: helpers.root('dist'),
+    publicPath: '/static/',
+    filename: isProd ? 'scripts/[name].[hash].js' : 'scripts/[name].js',
+    chunkFilename: 'scripts/[id].chunk.js?[chunkhash]'
+  };
+  config.module = {
     loaders: [
-      { test: /\.css$/, loader: 'style!css' },
-      { test: /\.less$/, loader: 'style!css!less' },
-      { test: /\.scss$/, loader: 'style!css!sass' },
-      { test: /\.(png|jpe?g)$/, loader: 'url?limit=25000' },
-      { test: /\.woff$/, loader: 'url?limit=100000' }
+      { test: /\.css$/, loader: ExtractTextPlugin.extract('style', 'css') },
+      { test: /\.less$/, loader: ExtractTextPlugin.extract('css!less') },
+      { test: /\.scss$/, loader: ExtractTextPlugin.extract('css!sass') },
+      { test: /\.html$/, loader: "html?-minimize" },
+      { test: /\.(woff|woff2|ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader?name=./fonts/[name].[ext]' },
+      { test: /\.(png|jpe?g|gif)$/, loader: 'url-loader?limit=8192&name=img/[name]-[hash].[ext]' }
     ]
-  },
-  plugins: [
-    new webpack.BannerPlugin('hello world'),
-    new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js'),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      },
+  };
+  config.plugins = [
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery'
     }),
-    new HtmlWebpackPlugin({
-      filename: 'pages/blank.html',
-      template: path.resolve(__dirname, './src/pages/blank.html'),
-      inject: true
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendors', // 将公共模块提取，生成名为`vendors`的chunk
+      chunks: ['index', 'blank'], //提取哪些模块共有的部分
+      minChunks: chunks.length
     }),
-    new HtmlWebpackPlugin({
-      filename: 'pages/butons.html',
-      template: path.resolve(__dirname, './src/pages/buttons.html'),
-      inject: true
-    })
-  ]
-}
-
-
-var walk = function(dir, done) {
-  var results = [];
-  fs.readdir(dir, function(err, list) {
-    if (err) return done(err);
-    var pending = list.length;
-    if (!pending) return done(null, results);
-    list.forEach(function(file) {
-      file = path.resolve(dir, file);
-      fs.stat(file, function(err, stat) {
-        if (stat && stat.isDirectory()) {
-          walk(file, function(err, res) {
-            results = results.concat(res);
-            if (!--pending) done(null, results);
-          });
-        } else {
-          results.push(file);
-          if (!--pending) done(null, results);
+    new ExtractTextPlugin('styles/[name].css'), //单独使用link标签加载css并设置路径，相对于output配置中的publickPath
+  ];
+  if (isProd) {
+    config.plugins.push(
+      new webpack.optimize.UglifyJsPlugin({
+        compress: {
+          warnings: false
         }
-      });
-    });
-  });
-};
-var htmls=walk('./src/pages', function(err, results) {
-  if (err) throw err;
-  console.log(results);
-  console.log(path.resolve(__dirname, './src/pages/buttons.html'));
-  console.log(__dirname);
-});
-console.log(htmls+'----------');
+      })
+    );
+  }
+  config.devServer = {
+    contentBase: './src',
+    quiet: true,
+    hot: true, //热启动
+  }
 
-var entries = {};
-var HtmlPlugin = [];
-for (var key in htmls) {
-    entries[key] = htmls[key].replace('.html', '.js')
-    HtmlPlugin.push(new HtmlWebpackPlugin({
-      filename: (key == 'index\\index' ? 'index.html' : key + '.html'),
-      template: htmls[key],
-      inject: true,
-        chunks: [key]
-    }))
+  var pages = Object.keys(getEntry('src/views/**/*.html', 'src/views/'));
+  console.log('222222222222222222' + pages);
+  pages.forEach(function (pathname) {
+    var conf = {
+      filename: helpers.root('dist/') + pathname + '.html', //生成的html存放路径，相对于path
+      template: 'src/views/' + pathname + '.html', //html模板路径
+      inject: false,  //js插入的位置，true/'head'/'body'/false
+    };
+    if (pathname in config.entry) {
+      conf.inject = 'body';
+      conf.chunks = ['vendors', pathname];
+      conf.hash = true;
+    }
+    config.plugins.push(new HtmlWebpackPlugin(conf));
+  });
+
+
+  return config;
+} ();
+
+
+function getEntry(globPath, pathDir) {
+  var files = glob.sync(globPath);
+  var entries = {}, entry, dirname, basename, pathname, extname;
+
+  for (var i = 0; i < files.length; i++) {
+    entry = files[i];
+    dirname = path.dirname(entry);
+    extname = path.extname(entry);
+    basename = path.basename(entry, extname);
+    pathname = path.join(dirname, basename);
+
+    var re = /\\/gi;
+    var unpathname = pathname.replace(re, '/');
+    pathname = pathDir ? unpathname.replace(new RegExp('^' + pathDir), '') : unpathname;
+    console.log('newpathname:' + pathname);
+    entries[pathname] = ['./' + entry];
+  }
+  return entries;
 }
+
+
+
+
