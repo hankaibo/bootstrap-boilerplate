@@ -1,22 +1,27 @@
-// Helper: root() is defined at the bottom
-var path = require('path');
-var webpack = require('webpack');
-
-// Webpack Plugins
-var CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
-var autoprefixer = require('autoprefixer');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var HtmlwebpackPlugin = require('html-webpack-plugin');
-
 /**
- * Env
- * Get npm lifecycle event to identify the environment
+ *@author:hankaibo
+ */
+
+var path = require('path');
+var glob = require('glob');
+var webpack = require('webpack');
+var helpers = require('./helpers');
+
+/*
+ * Webpack Plugins
+ */
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+/*
+ * Webpack Constants
  */
 var ENV = process.env.npm_lifecycle_event;
 var isProd = ENV === 'build';
 
 module.exports = function makeWebpackConfig() {
-
+  var entries = getEntry('src/scripts/page/**/*.js', 'src/scripts/page/');
+  var chunks = Object.keys(entries);
   var config = {};
 
   if (isProd) {
@@ -24,179 +29,91 @@ module.exports = function makeWebpackConfig() {
   } else {
     config.devtool = 'eval-source-map';
   }
-
   config.debug = !isProd;
-  config.entry = {
-    'blank': './src/js/sb-admin-2.js',
-    'buttons': './src/js/sb-admin-2.js',
-    'echarts': './src/js/sb-admin-2.js',
-    'ent-info': './src/js/sb-admin-2.js',
-    'forms': './src/js/sb-admin-2.js',
-    'grid': './src/js/sb-admin-2.js',
-    'icons': './src/js/sb-admin-2.js',
-    'index': './src/js/sb-admin-2.js',
-    'login': './src/js/sb-admin-2.js',
-    'notifications': './src/js/sb-admin-2.js',
-    'panels-wells': './src/js/sb-admin-2.js',
-    'tables': './src/js/sb-admin-2.js',
-    'typography': './src/js/sb-admin-2.js',
-    'vendors': './src/js/vendor.js'
-  };
+  config.entry = entries;
   config.output = {
-    path: root('dist'),
-    filename: isProd ? 'js/[name].[hash].js' : 'js/[name].js'
-  };
-  config.resolve = {
-    cache: true,
-    root: root(),
-    extensions: ['', '.js', '.json', '.css', '.scss'],
-    alias: {
-      'app': 'src/pages',
-    }
+    path: helpers.root('dist'),
+    publicPath: '/static/',
+    filename: isProd ? 'scripts/[name].[hash].js' : 'scripts/[name].js',
+    chunkFilename: 'scripts/[id].chunk.js?[chunkhash]'
   };
   config.module = {
-    preLoaders: [],
     loaders: [
-      {
-        test: /\.jsx?$/,
-        loader: 'babel',
-        include: root('src', 'js'),
-        query: {
-          presets: ['es2015']
-        }
-      },
-      {
-        test: /\.scss$/,
-        include: root('src', 'css'),
-        loader: ['style', 'css?sourceMap', 'sass?sourceMap']
-      }
-    ],
-    postLoaders: []
+      { test: /\.css$/, loader: ExtractTextPlugin.extract('style', 'css') },
+      { test: /\.less$/, loader: ExtractTextPlugin.extract('css!less') },
+      { test: /\.scss$/, loader: ExtractTextPlugin.extract('css!sass') },
+      { test: /\.html$/, loader: "html?-minimize" },
+      { test: /\.(woff|woff2|ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader?name=./fonts/[name].[ext]' },
+      { test: /\.(png|jpe?g|gif)$/, loader: 'url-loader?limit=8192&name=img/[name]-[hash].[ext]' }
+    ]
   };
   config.plugins = [
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'blank.html'),
-      filename: 'blank.html',
-      chunks: ['blank'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'buttons.html'),
-      filename: 'buttons.html',
-      chunks: ['buttons'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'echarts.html'),
-      filename: 'echarts.html',
-      chunks: ['echarts'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'ent-info.html'),
-      filename: 'ent-info.html',
-      chunks: ['ent-info'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'forms.html'),
-      filename: 'forms.html',
-      chunks: ['forms'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'grid.html'),
-      filename: 'grid.html',
-      chunks: ['grid'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'icons.html'),
-      filename: 'icons.html',
-      chunks: ['icons'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'index.html'),
-      filename: 'index.html',
-      chunks: ['index'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'login.html'),
-      filename: 'login.html',
-      chunks: ['login'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'notifications.html'),
-      filename: 'notifications.html',
-      chunks: ['notifications'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'panels-wells.html'),
-      filename: 'panels-wells.html',
-      chunks: ['panels-wells'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'tables.html'),
-      filename: 'tables.html',
-      chunks: ['tables'],
-      inject: 'body'
-    }),
-    new HtmlwebpackPlugin({
-      template: root('src/pages', 'typography.html'),
-      filename: 'typography.html',
-      chunks: ['typography'],
-      inject: 'body'
-    }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        ENV: JSON.stringify(ENV)
-      }
-    }),
-    new CommonsChunkPlugin({
-      name: ['vendors']
-    }),
     new webpack.ProvidePlugin({
-      $: "jquery",
-      jQuery: "jquery",
-      "window.jQuery": "jquery"
-    })
+      $: 'jquery',
+      jQuery: 'jquery'
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendors', // 将公共模块提取，生成名为`vendors`的chunk
+      chunks: ['index', 'blank'], //提取哪些模块共有的部分
+      minChunks: chunks.length
+    }),
+    new ExtractTextPlugin('styles/[name].css'), //单独使用link标签加载css并设置路径，相对于output配置中的publickPath
   ];
-
   if (isProd) {
     config.plugins.push(
-      new webpack.NoErrorsPlugin(),
-      new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.UglifyJsPlugin({ minimize: true })
-      // new CopyWebpackPlugin([{
-      //   from: root('src')
-      // }])
+      new webpack.optimize.UglifyJsPlugin({
+        compress: {
+          warnings: false
+        }
+      })
     );
   }
-
-  config.postcss = [
-    autoprefixer({
-      browsers: ['last 2 version']
-    })
-  ];
-  if (!isProd) {
-    config.devServer = {
-      historyApiFallback: true,
-      hot: true,
-      inline: true,
-      progress: true
-    };
+  config.devServer = {
+    contentBase: './src',
+    quiet: true,
+    hot: true, //热启动
   }
+
+  var pages = Object.keys(getEntry('src/views/**/*.html', 'src/views/'));
+  pages.forEach(function (pathname) {
+    var conf = {
+      filename: helpers.root('dist/') + pathname + '.html', //生成的html存放路径，相对于path
+      template: 'src/views/' + pathname + '.html', //html模板路径
+      inject: false,  //js插入的位置，true/'head'/'body'/false
+    };
+    if (pathname in config.entry) {
+      conf.inject = 'body';
+      conf.chunks = ['vendors', pathname];
+      conf.hash = true;
+    }
+    config.plugins.push(new HtmlWebpackPlugin(conf));
+  });
+
 
   return config;
 } ();
 
-// Helper functions
-function root(args) {
-  args = Array.prototype.slice.call(arguments, 0);
-  return path.join.apply(path, [__dirname].concat(args));
+
+function getEntry(globPath, pathDir) {
+  var files = glob.sync(globPath);
+  var entries = {}, entry, dirname, basename, pathname, extname;
+
+  for (var i = 0; i < files.length; i++) {
+    entry = files[i];
+    dirname = path.dirname(entry);
+    extname = path.extname(entry);
+    basename = path.basename(entry, extname);
+    pathname = path.join(dirname, basename);
+
+    var re = /\\/gi;
+    var unpathname = pathname.replace(re, '/');
+    pathname = pathDir ? unpathname.replace(new RegExp('^' + pathDir), '') : unpathname;
+    console.log('newpathname:' + pathname);
+    entries[pathname] = ['./' + entry];
+  }
+  return entries;
 }
+
+
+
+
