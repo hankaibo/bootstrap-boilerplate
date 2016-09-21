@@ -23,7 +23,13 @@ require('../common/echarts-data.js');
  */
 
 $(function () {
-  alert(123);
+  radarChart();
+  dashboardChart();
+  columnChart();
+  barChart();
+});
+
+function radarChart() {
   var myChart = echarts.init(document.getElementById('echarts-radar-chart'));
   // 绘制图表
   myChart.setOption({
@@ -61,4 +67,122 @@ $(function () {
       ]
     }]
   });
-});
+}
+
+function dashboardChart() {
+  var myChart = echarts.init(document.getElementById('echarts-dashboard-chart'));
+  // 绘制图表
+  var option = {
+    tooltip: {
+      formatter: "{a} <br/>{b} : {c}%"
+    },
+    toolbox: {
+      feature: {
+        restore: {},
+        saveAsImage: {}
+      }
+    },
+    series: [
+      {
+        name: '业务指标',
+        type: 'gauge',
+        detail: { formatter: '{value}%' },
+        data: [{ value: 50, name: '完成率' }]
+      }
+    ]
+  };
+  myChart.setOption(option);
+
+  setInterval(function () {
+    option.series[0].data[0].value = (Math.random() * 100).toFixed(2) - 0;
+    myChart.setOption(option, true);
+  }, 2000);
+}
+
+function columnChart() {
+  var myChart = echarts.init(document.getElementById('echarts-column-chart'));
+  // 绘制图表
+  option = {
+    color: ['#3398DB'],
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: [
+      {
+        type: 'category',
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        axisTick: {
+          alignWithLabel: true
+        }
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value'
+      }
+    ],
+    series: [
+      {
+        name: '直接访问',
+        type: 'bar',
+        barWidth: '60%',
+        data: [10, 52, 200, 334, 390, 330, 220]
+      }
+    ]
+  };
+  myChart.setOption(option);
+}
+
+function barChart() {
+  var myChart = echarts.init(document.getElementById('echarts-bar-chart'));
+  // 绘制图表
+  option = {
+    title: {
+      text: '某站点用户访问来源',
+      subtext: '纯属虚构',
+      x: 'center'
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: "{a} <br/>{b} : {c} ({d}%)"
+    },
+    legend: {
+      orient: 'vertical',
+      left: 'left',
+      data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+    },
+    series: [
+      {
+        name: '访问来源',
+        type: 'pie',
+        radius: '55%',
+        center: ['50%', '60%'],
+        data: [
+          { value: 335, name: '直接访问' },
+          { value: 310, name: '邮件营销' },
+          { value: 234, name: '联盟广告' },
+          { value: 135, name: '视频广告' },
+          { value: 1548, name: '搜索引擎' }
+        ],
+        itemStyle: {
+          emphasis: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        }
+      }
+    ]
+  };
+
+  myChart.setOption(option);
+}
