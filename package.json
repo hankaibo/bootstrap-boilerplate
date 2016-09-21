@@ -1,6 +1,6 @@
 {
   "name": "mybootstrap",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "An open source, admin dashboard template for Bootstrap.",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "clean-start": "npm run clean-install && npm start",
     "watch": "webpack --watch --progress --profile",
     "build": "rimraf dist && webpack --progress --profile --bail",
-    "server": "webpack-dev-server --inline --port 8080",
+    "server": "webpack-dev-server --inline --hot --port 8080",
     "start": "npm run server"
   },
   "repository": {
@@ -17,13 +17,18 @@
     "url": "https://git.oschina.net/hankaibo/mybootstrap.git"
   },
   "keywords": [
-    "bootstrap"
+    "webpack bootstrap"
   ],
   "author": "hankaibo",
   "license": "ISC",
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "bootstrap-social": "^5.0.0",
+    "datatables": "^1.10.12",
+    "datatables-bootstrap": "0.0.1",
+    "datatables-responsive": "^1.0.7",
     "font-awesome": "^4.6.3",
+    "holderjs": "^2.9.4",
     "jquery": "^3.1.0",
     "metismenu": "^2.5.2"
   },

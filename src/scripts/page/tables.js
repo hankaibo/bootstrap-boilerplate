@@ -3,6 +3,8 @@
  * 支持css,less,scss三种格式
  */
 require('bootstrap/dist/css/bootstrap.min.css');
+require('datatables-bootstrap/css/dataTables.bootstrap.css');
+require('datatables-responsive/css/responsive.dataTables.scss');
 require('metismenu/dist/metisMenu.min.css');
 require('font-awesome/css/font-awesome.min.css');
 require('../../styles/common/sb-admin-2.css');
@@ -13,4 +15,14 @@ require('../../styles/common/sb-admin-2.css');
 require('jquery/dist/jquery.min.js');
 require('bootstrap/dist/js/bootstrap.min.js');
 require('metisMenu/dist/metisMenu.min.js');
+require('datatables/media/js/jquery.dataTables.min.js');
+require('datatables-bootstrap/js/dataTables.bootstrap.min.js');
+// require('datatables-responsive/js/dataTables.responsive.js'); //TODO with error
 require('../common/sb-admin-2.js');
+
+
+$(document).ready(function () {
+  $('#dataTables-example').DataTable({
+    responsive: true
+  });
+});

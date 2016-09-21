@@ -14,3 +14,13 @@ require('jquery/dist/jquery.min.js');
 require('bootstrap/dist/js/bootstrap.min.js');
 require('metisMenu/dist/metisMenu.min.js');
 require('../common/sb-admin-2.js');
+
+// tooltip demo
+$('.tooltip-demo').tooltip({
+  selector: "[data-toggle=tooltip]",
+  container: "body"
+})
+
+// popover demo
+$("[data-toggle=popover]")
+  .popover()
