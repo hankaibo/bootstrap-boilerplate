@@ -13,6 +13,13 @@ require('../../styles/common/sb-admin-2.css');
 require('jquery/dist/jquery.min.js');
 require('bootstrap/dist/js/bootstrap.min.js');
 require('metisMenu/dist/metisMenu.min.js');
-
 require('../common/sb-admin-2.js');
-require('../common/echarts-data.js');
+var myEchart=require('../common/echarts-data.js');
+
+//
+$(function () {
+  myEchart.columnChart();
+  myEchart.barChart();
+  myEchart.dashboardChart();
+  myEchart.radarChart();
+});

@@ -3,12 +3,6 @@
  * ECharts 示例
  */
 var echarts = require('echarts');
-$(function () {
-  radarChart();
-  dashboardChart();
-  columnChart();
-  barChart();
-});
 
 function radarChart() {
   var myChart = echarts.init(document.getElementById('echarts-radar-chart'));
@@ -167,3 +161,11 @@ function barChart() {
 
   myChart.setOption(option);
 }
+
+var myEchart={
+  radarChart:radarChart,
+  dashboardChart:dashboardChart,
+  columnChart:columnChart,
+  barChart:barChart
+}
+module.exports=myEchart;

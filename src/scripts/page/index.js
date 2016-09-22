@@ -14,3 +14,9 @@ require('jquery/dist/jquery.min.js');
 require('bootstrap/dist/js/bootstrap.min.js');
 require('metisMenu/dist/metisMenu.min.js');
 require('../common/sb-admin-2.js');
+var myEchart=require('../common/echarts-data.js');
+
+//
+$(function () {
+  myEchart.columnChart();
+});
