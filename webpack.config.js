@@ -62,7 +62,7 @@ module.exports = function makeWebpackConfig() {
     }),
     new ExtractTextPlugin('styles/[name].[hash].css', { disable: !isProd }), //单独使用link标签加载css并设置路径，相对于output配置中的publickPath
   ];
-  if (isProd && false) { // TODO 我自己的项目不需要压缩代码
+  if (isProd) {
     config.plugins.push(
       new webpack.optimize.UglifyJsPlugin({
         compress: {
