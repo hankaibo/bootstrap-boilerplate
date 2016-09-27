@@ -9,6 +9,7 @@ var helpers = require('./helpers');
 /*
  * Webpack Plugins
  */
+var autoprefixer = require('autoprefixer');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
@@ -38,12 +39,15 @@ module.exports = function makeWebpackConfig() {
   };
   config.module = {
     loaders: [
-      { test: /\.css$/, loader: ExtractTextPlugin.extract('style', 'css') },
+      { test: /\.css$/, exclude: helpers.root('src', 'views'), loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss') },
+      { test: /\.css$/, include: helpers.root('src', 'views'), loader: 'raw!postcss' },
       { test: /\.less$/, loader: ExtractTextPlugin.extract('css!less') },
-      { test: /\.scss$/, loader: ExtractTextPlugin.extract('css!sass') },
+      { test: /\.scss$/, include: helpers.root('src', 'styles'), loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass') },
+      { test: /\.scss$/, exclude: helpers.root('src', 'styles'), loader: 'raw!postcss!sass' },
       { test: /\.html$/, loader: "html?-minimize" },
       { test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file?name=fonts/[name].[hash].[ext]?' }
-    ]
+    ],
+    postLoaders: []
   };
   config.plugins = [
     new webpack.ProvidePlugin({
@@ -64,6 +68,8 @@ module.exports = function makeWebpackConfig() {
   ];
   if (isProd) {
     config.plugins.push(
+      new webpack.NoErrorsPlugin(),
+      new webpack.optimize.DedupePlugin(),
       new webpack.optimize.UglifyJsPlugin({
         compress: {
           warnings: false
@@ -71,11 +77,16 @@ module.exports = function makeWebpackConfig() {
       })
     );
   }
+  config.postcss = [
+    autoprefixer({
+      browsers: ['last 2 version']
+    })
+  ];
   config.devServer = {
     contentBase: './src',
     historyApiFallback: true,
-    quiet: false
-  }
+    quiet: true
+  };
 
   var pages = Object.keys(helpers.getEntry('src/views/**/*.html', 'src/views/'));
   pages.forEach(function (pathname) {

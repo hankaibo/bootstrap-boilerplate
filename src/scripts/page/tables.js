@@ -17,7 +17,7 @@ require('bootstrap/dist/js/bootstrap.min.js');
 require('metisMenu/dist/metisMenu.min.js');
 require('datatables/media/js/jquery.dataTables.min.js');
 require('datatables-bootstrap/js/dataTables.bootstrap.min.js');
-// require('datatables-responsive/js/dataTables.responsive.js'); //TODO with error
+/* require('datatables-responsive/js/dataTables.responsive.js'); //TODO with error */
 require('../common/sb-admin-2.js');
 
 

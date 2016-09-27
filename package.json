@@ -34,6 +34,7 @@
     "metismenu": "^2.5.2"
   },
   "devDependencies": {
+    "autoprefixer": "^6.4.1",
     "css-loader": "^0.25.0",
     "eslint": "^3.3.1",
     "eslint-config-google": "^0.6.0",
@@ -45,6 +46,8 @@
     "less": "^2.7.1",
     "less-loader": "^2.2.3",
     "node-sass": "^3.10.0",
+    "postcss-loader": "^0.13.0",
+    "raw-loader": "^0.5.1",
     "rimraf": "^2.5.4",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
