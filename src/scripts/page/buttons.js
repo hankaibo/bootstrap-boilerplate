@@ -6,7 +6,7 @@ require('bootstrap/dist/css/bootstrap.min.css');
 require('bootstrap-social/bootstrap-social.css');
 require('metismenu/dist/metisMenu.min.css');
 require('font-awesome/css/font-awesome.min.css');
-require('../../styles/common/sb-admin-2.css');
+require('../../styles/common/sb-admin-2.scss');
 
 /**
  * 引入js

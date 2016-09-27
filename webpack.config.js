@@ -42,8 +42,8 @@ module.exports = function makeWebpackConfig() {
       { test: /\.css$/, exclude: helpers.root('src', 'views'), loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss') },
       { test: /\.css$/, include: helpers.root('src', 'views'), loader: 'raw!postcss' },
       { test: /\.less$/, loader: ExtractTextPlugin.extract('css!less') },
-      { test: /\.scss$/, include: helpers.root('src', 'styles'), loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass') },
-      { test: /\.scss$/, exclude: helpers.root('src', 'styles'), loader: 'raw!postcss!sass' },
+      { test: /\.scss$/, loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass') },
+      // { test: /\.scss$/, exclude: helpers.root('src', 'styles'), loader: 'raw!postcss!sass' },
       { test: /\.html$/, loader: "html?-minimize" },
       { test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file?name=fonts/[name].[hash].[ext]?' }
     ],
@@ -85,7 +85,7 @@ module.exports = function makeWebpackConfig() {
   config.devServer = {
     contentBase: './src',
     historyApiFallback: true,
-    quiet: true
+    quiet: false
   };
 
   var pages = Object.keys(helpers.getEntry('src/views/**/*.html', 'src/views/'));
