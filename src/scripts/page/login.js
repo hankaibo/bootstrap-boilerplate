@@ -3,8 +3,6 @@
  * 支持css,less,scss三种格式
  */
 require('bootstrap/dist/css/bootstrap.min.css');
-require('metismenu/dist/metisMenu.min.css');
-require('font-awesome/css/font-awesome.min.css');
 require('../../styles/common/sb-admin-2.less');
 
 /**

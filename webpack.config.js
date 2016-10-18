@@ -39,11 +39,10 @@ module.exports = function makeWebpackConfig() {
   };
   config.module = {
     loaders: [
-      { test: /\.css$/, exclude: helpers.root('src', 'views'), loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss') },
+      { test: /\.css$/, exclude: helpers.root('src', 'views'), loader: ExtractTextPlugin.extract('style', 'css!postcss') },
       { test: /\.css$/, include: helpers.root('src', 'views'), loader: 'raw!postcss' },
-      { test: /\.less$/, loader: ExtractTextPlugin.extract('css!less') },
-      { test: /\.scss$/, loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass') },
-      // { test: /\.scss$/, exclude: helpers.root('src', 'styles'), loader: 'raw!postcss!sass' },
+      { test: /\.less$/, loader: ExtractTextPlugin.extract('style', 'css!postcss!less') },
+      { test: /\.scss$/, loader: ExtractTextPlugin.extract('style', 'css!postcss!sass') },
       { test: /\.html$/, loader: "html?-minimize" },
       { test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file?name=fonts/[name].[hash].[ext]?' }
     ],
