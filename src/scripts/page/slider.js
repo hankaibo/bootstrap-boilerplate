@@ -20,7 +20,7 @@ require('metisMenu/dist/metisMenu.min.js');
 require('ion-rangeslider/js/ion.rangeSlider.js');
 require('../common/sb-admin-2.js');
 
-$(function() {
+$(function () {
     $("#range_01").ionRangeSlider();
     $("#range_02").ionRangeSlider({
         min: 100,
@@ -118,7 +118,7 @@ $(function() {
         from: 40000,
         to: 1000,
         prettify_enabled: true,
-        prettify: function(num) {
+        prettify: function (num) {
             return (Math.random() * num.toFixed(0));
         }
     });
@@ -168,10 +168,12 @@ $(function() {
         decorate_both: false
     });
     $("#range_19").ionRangeSlider({
+        type: "double",
         min: +moment().subtract(1, "years").format("X"),
         max: +moment().format("X"),
         from: +moment().subtract(6, "months").format("X"),
-        prettify: function(num) {
+        to: +moment().subtract(7, "months").format("X"),
+        prettify: function (num) {
             return moment(num, "X").format("LL");
         }
     });
@@ -193,19 +195,19 @@ $(function() {
         from: 2000,
         to: 4000,
         step: 100,
-        onStart: function(data) {
+        onStart: function (data) {
             console.log(data);
             track(data);
         },
-        onChange: function(data) {
+        onChange: function (data) {
             console.log(data);
             track(data);
         },
-        onFinish: function(data) {
+        onFinish: function (data) {
             console.log(data);
             track(data);
         },
-        onUpdate: function(data) {
+        onUpdate: function (data) {
             console.log(data);
             track(data);
         }
