@@ -801,14 +801,12 @@
                 <pre>
                   <code>
                     $("#range_19").ionRangeSlider({
-                      type: "double",
-                      min: 100,
-                      max: 200,
-                      from: 148,
-                      to: 152,
-                      prefix: "Weight: ",
-                      postfix: " million pounds",
-                      values_separator: " → "
+                        min: +moment().subtract(1, "years").format("X"),
+                        max: +moment().format("X"),
+                        from: +moment().subtract(6, "months").format("X"),
+                        prettify: function(num) {
+                            return moment(num, "X").format("LL");
+                        }
                     });
                   </code>
                 </pre>
