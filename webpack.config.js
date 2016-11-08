@@ -27,7 +27,7 @@ module.exports = function makeWebpackConfig() {
   if (isProd) {
     config.devtool = 'source-map';
   } else {
-    config.devtool = 'eval-source-map';
+    config.devtool = 'cheap-source-map';
   }
   config.debug = !isProd;
   config.entry = entries;
