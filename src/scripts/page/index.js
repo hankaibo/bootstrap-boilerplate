@@ -10,13 +10,17 @@ require('../../styles/common/sb-admin-2.scss');
 /**
  * 引入js
  */
-require('jquery/dist/jquery.min.js');
-require('bootstrap/dist/js/bootstrap.min.js');
-require('metisMenu/dist/metisMenu.min.js');
+require('jquery');
+require('bootstrap');
+require('metisMenu');
 require('../common/sb-admin-2.js');
-var myEchart=require('../common/echarts-data.js');
 
 //
 $(function () {
-  myEchart.columnChart();
+  function parse(spec,id) {
+    vg.parse.spec(spec, function (error, chart) {
+      chart({ el: id }).update();
+    });
+  }
+  parse("../scripts/data/stacked_area.json","#D3-column-chart");
 });

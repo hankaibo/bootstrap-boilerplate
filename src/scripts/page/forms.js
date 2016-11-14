@@ -10,9 +10,9 @@ require('../../styles/common/sb-admin-2.scss');
 /**
  * 引入js
  */
-require('jquery/dist/jquery.min.js');
-require('bootstrap/dist/js/bootstrap.min.js');
-require('metisMenu/dist/metisMenu.min.js');
+require('jquery');
+require('bootstrap');
+require('metisMenu');
 require('../common/sb-admin-2.js');
 
 // tooltip demo
