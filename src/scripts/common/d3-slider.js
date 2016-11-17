@@ -16,7 +16,7 @@
   }
 } (this, function (d3) {
   // exposed methods
-  function slider() {
+  function slider2() {
     "use strict";
     // Public variables width default settings
     var min = 0,
@@ -397,5 +397,5 @@
     return slider;
   }
 
-  return d3.slider = slider;
+  return d3.slider = slider2;
 }));
