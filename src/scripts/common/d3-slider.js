@@ -16,7 +16,7 @@
   }
 } (this, function (d3) {
   // exposed methods
-  function slider2() {
+  function slider() {
     "use strict";
     // Public variables width default settings
     var min = 0,
@@ -121,7 +121,6 @@
           }
           sliderLength = parseInt(div.style('height'), 10);
         }
-
         if (axis) {
           createAxis(div);
         }
@@ -174,7 +173,6 @@
           }
           g.call(axis);
         }
-
         function onClickHorizontal() {
           if (toType(value) != 'array') {
             var pos = Math.max(0, Math.min(sliderLength, d3.event.offsetX || d3.event.layerX));
@@ -397,5 +395,5 @@
     return slider;
   }
 
-  return d3.slider = slider2;
+  return d3.slider = slider;
 }));
