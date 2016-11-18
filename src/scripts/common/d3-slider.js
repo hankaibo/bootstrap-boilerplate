@@ -5,11 +5,7 @@
   if (typeof define === 'function' && define.amd) {
     // AMD
     define(['d3'], factory);
-  } else if (typeof exports === 'object') {
-    // Node, CommonJS-like
-    if (process.browser) {
-      // require('./d3.slider.css');
-    }
+  } else if (typeof exports === 'object' && module.exports) {
     module.exports = factory(require('d3'));
   } else {
     root.returnExports = factory(root.d3)

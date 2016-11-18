@@ -357,6 +357,89 @@
             <h1 class="page-header">Blank</h1>
           </div>
           <!-- /.col-lg-12 -->
+          <div class="col-lg-12">
+            <div id="graphHolder"></div>
+
+            <div id="toolbox">
+              <p id="titlep">
+                <div id="title">
+                  Lifespan, 2014
+                </div>
+                <br/>
+                <a class="boton" href="http://www.cotrino.com/" target="_blank">&copy; Cotrino.com</a>
+                <a class="boton" href="#" onClick="about();return false;">How it works</a>
+              </p>
+              <div id="sliderContainer">
+                Zoom: <span id="similarity"></span>
+                <div id="slider"></div>
+              </div>
+              <div id="chartSelector"></div>
+              <div id="species_information">
+                <p id="hint">Click on any species to show its Wikipedia article.</p>
+              </div>
+            </div>
+            <div id="about" title="How it works">
+              <p>
+                The "Lifespan" visualization represents the maximum longevity of multiple species, as documented by James R. Carey and Debra
+                S. Judge in their book "<i>Longevity Records:
+				Life Spans of Mammals, Birds, Amphibians, Reptiles, and Fish</i>", published online by the
+                <a href="http://www.demogr.mpg.de/longevityrecords/">Max Planck Institute for Demographic Research</a>. Of
+                the around 4000 records in the book, only the 200 most popular species are shown here.
+              </p>
+              <p>
+                For each species, only its <b>maximum achieved age</b> is shown, either in the wild on in captivity.
+              </p>
+              <p>
+                This has been possible thanks to:
+              </p>
+              <ul>
+                <li>
+                  <a href="http://www.demogr.mpg.de/longevityrecords/" target="_blank">"Longevity Records:
+					Life Spans of Mammals, Birds, Amphibians, Reptiles, and Fish", by James R. Carey and Debra S. Judge</a>
+                </li>
+                <li>
+                  Floating icons are miniaturized versions of the respective images available in the linked <a href="http://www.wikipedia.org/"
+                    target="_blank">Wikipedia</a> articles, used here for educational purposes only.
+                </li>
+                <li>
+                  Inspired by an article in <a href="http://www.informationisbeautiful.net/2011/vintage-infoporn-no-1/" target="_blank">Information is Beautiful</a>.
+                </li>
+                <li>
+                  <a href="http://d3js.org/" target="_blank">D3.js</a>
+                </li>
+                <li>
+                  <a href="http://www.perl.org/" target="_blank">Perl</a>
+                </li>
+                <li>
+                  <a href="https://developer.mozilla.org/en-US/docs/JavaScript" target="_blank">JavaScript</a>
+                </li>
+                <li>
+                  <a href="http://www.w3.org/Style/CSS/" target="_blank">CSS</a>
+                </li>
+                <li>
+                  <a href="http://jquery.com/" target="_blank">jQuery</a>
+                </li>
+                <li>
+                  <a href="http://www.ubuntu.com/" target="_blank">Ubuntu Linux</a>
+                </li>
+                <li>
+                  <a href="http://www.eclipse.org/" target="_blank">Eclipse</a>
+                </li>
+                <li>
+                  <a href="http://www.google.com/chrome/" target="_blank">Google Chrome</a>
+                </li>
+              </ul>
+              <a class="boton" href="http://www.cotrino.com/" target="_blank">&copy; Cotrino.com</a>
+              <p id="hint">You may not reproduce, adapt, modify, communicate to the public, reproduce or otherwise use any part of this
+                website (in particular for commercial purposes) except with written permission from the author.
+              </p>
+            </div>
+            <script type="text/javascript">
+			$(function() {
+				initLifespanFlower();
+			});
+		</script>
+          </div>
         </div>
         <!-- /.row -->
       </div>
