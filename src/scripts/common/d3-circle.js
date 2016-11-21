@@ -13,12 +13,6 @@
   // exposed methods
   function Circle() {
     'use strict';
-    var dataset = {
-      nodes: [
-        { name: 'AdamAdamAdamAdamAdamAdamAdamAdamAdamAdam' },
-        { name: 'BobBobBobBobBobBobBobBobBobBobBobBobBob' }
-      ]
-    };
     // Public variables width default settings
     var width = 960;
     var height = 960;
@@ -28,16 +22,22 @@
     var orbitWidth = '1px';
     var areaText = true;
     var areaChart = false;
+    var rad = 16;
+    var textAfterEdge = '';
+    var textAfterEdgeColor = '#fee';
+    var textAfterEdgeSize = '24';
+    var textBeforeEdge = '';
+    var textBeforeEdgeColor = '#fee';
+    var textBeforeEdgeSize = '24';
+    var defaultData = ["提供数据总量", "提供数据部委总量", "提供数据部委占比"];
     // Private variables
     var radius = Math.min(width, height);
     var radii = {
       'sun': radius / 8,
       'earthOrbit': radius / 2.5,
-      'earth': radius / 32,
       'rect': Math.sqrt(Math.pow(radius * .8, 2) / 2)
     };
     var top10 = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-    var format = d3.format(',d');
     var parseTime = d3.timeParse('%d-%b-%y');
 
     function circle(selection) {
@@ -52,22 +52,21 @@
 
         // Area
         if (areaText) {
-          var sun = svg.append('g').append('circle')
-            .attr('class', 'sun')
-            .attr('r', radii.sun)
-            .style('fill', 'rgba(255, 204, 0, 1.0)');
+          var sun = svg.append('g')
+            .attr('class', 'sun');
+          render(defaultData);
         } else if (areaChart) {
           var myrect = svg.append('g')
             .attr('class', 'myrect')
             .attr('transform', 'translate(' + -radii.rect / 2 + ',' + -radii.rect / 2 + ')');
 
-          var svg2 = d3.select("svg .myrect"),
+          var svg2 = d3.select('svg .myrect'),
             margin2 = { top: 20, right: 20, bottom: 30, left: 50 },
             width2 = radii.rect - margin2.left - margin2.right,
             height2 = radii.rect - margin2.top - margin2.bottom,
-            g = svg2.append("g");
+            g = svg2.append('g');
 
-          var parseTime = d3.timeParse("%d-%b-%y");
+          var parseTime = d3.timeParse('%d-%b-%y');
 
           var x = d3.scaleTime()
             .rangeRound([0, width2]);
@@ -80,7 +79,7 @@
             .y(function (d) { return y(d.close); });
 
 
-          d3.tsv("/scripts/data/line_chart.tsv", function (d) {
+          d3.tsv('/scripts/data/line_chart.tsv', function (d) {
             d.date = parseTime(d.date);
             d.close = +d.close;
             return d;
@@ -90,29 +89,28 @@
             x.domain(d3.extent(data, function (d) { return d.date; }));
             y.domain(d3.extent(data, function (d) { return d.close; }));
 
-            g.append("g")
-              .attr("class", "axis axis--x")
-              .attr("transform", "translate(0," + height2 + ")")
+            g.append('g')
+              .attr('class', 'axis axis--x')
+              .attr('transform', 'translate(0,' + height2 + ')')
               .call(d3.axisBottom(x));
 
-            g.append("g")
-              .attr("class", "axis axis--y")
+            g.append('g')
+              .attr('class', 'axis axis--y')
               .call(d3.axisLeft(y))
-              .append("text")
-              .attr("fill", "#000")
-              .attr("transform", "rotate(-90)")
-              .attr("y", 6)
-              .attr("dy", "0.71em")
-              .style("text-anchor", "end")
-              .text("Price ($)");
+              .append('text')
+              .attr('fill', '#000')
+              .attr('transform', 'rotate(-90)')
+              .attr('y', 6)
+              .attr('dy', '0.71em')
+              .style('text-anchor', 'end')
+              .text('Price ($)');
 
-            g.append("path")
+            g.append('path')
               .datum(data)
-              .attr("class", "line")
-              .attr("d", line);
+              .attr('class', 'line')
+              .attr('d', line);
           });
         }
-
         // Earth's orbit
         svg.append('circle')
           .attr('class', 'earthOrbit')
@@ -121,32 +119,33 @@
           .style('stroke', orbitColor)
           .style('stroke-width', orbitWidth);
 
-        // Current position of Earth in its orbit
-        var earthOrbitPosition = d3.arc()
+        // Current position of Text in its orbit
+        var textOrbitPosition = d3.arc()
           .outerRadius(radii.earthOrbit + 1)
           .innerRadius(radii.earthOrbit - 1)
-          .startAngle(0)
-          .endAngle(0);
+          .startAngle(2 * Math.PI * 3 / 4)
+          .endAngle(2 * Math.PI);
 
-        svg.append('path')
-          .attr('id', function (d, i) {
-            return 'edgepath' + i;
-          })
-          .attr('class', 'earthOrbitPosition')
-          .attr('d', earthOrbitPosition)
-          .style('fill', orbitColor);
-
-        var textOrbitPosition = d3.arc()
-          .outerRadius(radii.earthOrbit + 15)
-          .innerRadius(radii.earthOrbit - 5)
-          .startAngle(Math.PI + (Math.PI * 2) / 4)
-          .endAngle(Math.PI * 2);
-
-        // Pack pie
         if (value) {
-          // getData(value);
           createRightCircle(value);
-          createLeftText(value);
+          createLeftText();
+        }
+
+        function render(data) {
+          var text = d3.select('.sun')
+            .append('text')
+            .attr('x', 10)
+            .attr('y', -40)
+            .attr('font-size', 40);
+          text.selectAll('tspan')
+            .data(data)
+            .enter()
+            .append('tspan')
+            .attr('x', text.attr('x'))
+            .attr('dy', '1em')
+            .text(function (d) {
+              return d;
+            });
         }
 
         function createRightCircle(data) {
@@ -183,14 +182,12 @@
             .enter()
             .append('tspan')
             .attr('x', 0)
-            .attr('y', function (d, i, nodes) {
-              return 13 + (i - nodes.length / 2 - 0.5) * 10;
-            })
+            .attr('y', 12)
             .style('fill', 'white')
             .style('font-size', '42')
             .text(function (d) { return d; });
           node.append('title')
-            .text(function (d) { return d.id + '\n' + format(d.value); });
+            .text(function (d) { return d.id; });
           // TODO start
           node.append('clipPath')
             .attr('id', function (d) {
@@ -215,55 +212,53 @@
             .style('fill', 'white')
             .text(function (d) { return d.name; });
           // TODO end
-
           node.each(function (d, i) {
-            var hudu = (i + 1) * (2 * Math.PI / 16);
+            var hudu = (i + 1) * (2 * Math.PI / rad);
             var X = Math.sin(hudu) * radii.earthOrbit;
-            var Y = Math.cos(hudu) * radii.earthOrbit
-
+            var Y = Math.cos(hudu) * radii.earthOrbit;
             d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
 
-
-            // var pos = 0;
-            // while (i >= 0) {
-            //   pos += 2 * Math.PI * (radius / 32 + top10[i] * 2)
-            //   i--;
-            // }
-            // // pos = 2 * Math.PI * 2 / 10;
-            // var interpolateEarthOrbitPosition = d3.interpolate(earthOrbitPosition.endAngle()(), pos / (2 * Math.PI * radii.earthOrbit));
-
-            // console.log(Math.sin(interpolateEarthOrbitPosition(1) - earthOrbitPosition.startAngle()()));
-            // d3.select(this).attr('transform', 'translate(' + radii.earthOrbit * Math.sin(interpolateEarthOrbitPosition(3) - earthOrbitPosition.startAngle()()) + ',' + -radii.earthOrbit * Math.cos(interpolateEarthOrbitPosition(3) - earthOrbitPosition.startAngle()()) + ')');
-
-
-
-            d3.select(this).on('click', function () {
-              console.log('click');
+            d3.select(this).on('click', function (d) {
+              var newData = ["提供数据总量", "提供数据部委总量", "提供数据部委占比"];
+              newData.splice(1, 0, d.data.zongliang);
+              newData.splice(3, 0, d.data.buliang)
+              newData.splice(5, 0, d.data.zhanbi)
+              render(newData);
             });
           });
-
         }
 
-        function createLeftText(data) {
+        function createLeftText() {
           var circleText = svg.append('g')
             .attr('class', 'circleText');
 
-          circleText.append('defs').append('path')
+          circleText.append('path')
             .attr('id', 'curve')
             .attr('d', textOrbitPosition)
-            .style('fill', 'red');
+            .style('fill', 'none');
           circleText.append('text')
-            .attr('id', 'curve-text')
-            .style('fill', 'steelblue')
-            .style('font-size', '24')
+            .attr('id', 'curve-text-after')
+            .style('font-size', textAfterEdgeSize)
+            .style('color', textAfterEdgeColor)
             .style('font-weight', 'bold')
             .append('textPath')
             .attr('xlink:href', '#curve')
-            .text('.text熟字');
-
-          circleText.append('use')
-            .attr('id', 'curve-line')
+            .style('text-anchor', 'left')
+            .attr('startOffset', '20%')
+            .attr('dominant-baseline', 'text-after-edge')
+            .text(textAfterEdge);
+          circleText.append('text')
+            .attr('id', 'curve-text-before')
+            .style('font-size', textBeforeEdgeSize)
+            .style('color', textBeforeEdgeColor)
+            .style('font-weight', 'bold')
+            .append('textPath')
             .attr('xlink:href', '#curve')
+            .style('text-anchor', 'left')
+            .attr('startOffset', '20%')
+            .attr('dominant-baseline', 'text-before-edge')
+            .style('color', textBeforeEdgeColor)
+            .text(textBeforeEdge);
         }
 
       });
@@ -327,6 +322,55 @@
       }
       areaChart = _;
       areaText = !_;
+      return circle;
+    }
+    circle.rad = function (_) {
+      if (!arguments.length) {
+        return rad;
+      }
+      rad = _;
+      return circle;
+    }
+    circle.textAfterEdge = function (_) {
+      if (!arguments.length) {
+        return textAfterEdge;
+      }
+      textAfterEdge = _;
+      return circle;
+    }
+    circle.textAfterEdgeColor = function (_) {
+      if (!arguments.length) {
+        return textAfterEdgeColor;
+      }
+      textAfterEdgeColor = _;
+      return circle;
+    }
+    circle.textAfterEdgeSize = function (_) {
+      if (!arguments.length) {
+        return textAfterEdgeSize;
+      }
+      textAfterEdgeSize = _;
+      return circle;
+    }
+    circle.textBeforeEdge = function (_) {
+      if (!arguments.length) {
+        return textBeforeEdge;
+      }
+      textBeforeEdge = _;
+      return circle;
+    }
+    circle.textBeforeEdgeColor = function (_) {
+      if (!arguments.length) {
+        return textBeforeEdgeColor;
+      }
+      textBeforeEdgeColor = _;
+      return circle;
+    }
+    circle.textBeforeEdgeSize = function (_) {
+      if (!arguments.length) {
+        return textBeforeEdgeSize;
+      }
+      textBeforeEdgeSize = _;
       return circle;
     }
 
