@@ -163,30 +163,17 @@
             .text(function (d) { return d; });
           node.append('title')
             .text(function (d) { return d.id; });
-          // TODO start
-          node.append('clipPath')
-            .attr('id', function (d) {
-              return 'clip-out' + d.id;
-            })
-            .append('use')
-            .attr('xlink:href', function (d) {
-              return '#' + d.id;
-            });
           node.append('text')
-            .attr('clip-out-path', function (d) {
-              return 'url(#clip-out' + d.id + ')';
+            .attr('x', function (d, i, nodes) {
+              return i < 7 ? 50 : -35;
             })
-            .selectAll('tspan')
-            .data(function (d) { return d.class.split(/(?=[A-Z][^A-Z])/g); })
-            .enter()
-            .append('tspan')
-            .attr('x', 0)
             .attr('y', function (d, i, nodes) {
-              return 13 + (i - nodes.length / 2 - 0.5) * 10;
+              return 13 + (i - nodes.length / 2);
             })
-            .style('fill', 'white')
-            .text(function (d) { return d.name; });
-          // TODO end
+            .style('fill', 'block')
+            .text(function (d) {
+              return d.name;
+            });
           node.each(function (d, i) {
             var hudu = (i + 1) * (2 * Math.PI / rad);
             var X = Math.sin(hudu) * radii.earthOrbit;
