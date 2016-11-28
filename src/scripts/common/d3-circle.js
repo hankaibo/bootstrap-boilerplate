@@ -1,378 +1,358 @@
 /**
  * 本模块来源于http://bl.ocks.org/clayzermk1/9142407和http://bl.ocks.org/mbostock/4063269。
  */
-(function (root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    define(['d3'], factory);
-  } else if (typeof exports === 'object' && module.exports) {
-    module.exports = factory(require('d3'));
-  } else {
-    root.returnExports = factory(root.d3);
-  }
-} (this, function (d3) {
-  // exposed methods
-  function Circle() {
-    'use strict';
-    // Public variables width default settings
-    var width = 960;
-    var height = 960;
-    var value;
-    var backgroundColor = '#333';
-    var orbitColor = 'rgba(255, 204, 0, 0.75)';
-    var orbitWidth = '1px';
-    var areaText = true;
-    var areaChart = false;
-    var rad = 16;
-    var textAfterEdge = '';
-    var textAfterEdgeColor = '#fee';
-    var textAfterEdgeSize = '24';
-    var textBeforeEdge = '';
-    var textBeforeEdgeColor = '#fee';
-    var textBeforeEdgeSize = '24';
-    var defaultData = ['提供数据总量', 0, '提供数据部委总量', 0, '提供数据部委占比', 0];
-    var theme = 'blue';
-    // Private variables
-    var blueCircle = ['#5185dd', '#626cf7', '#5e69ff', '#3b82ff', '#2a90ff', '#0ca8ff', '#00b2fe', '#01bbe8', '#03c8c9', '#07d0ad', '#07d0ab', '#0dd0a2', '#1bc6a6', '#2db1b5', '#4199ca'];
-    var orangeCircle = ['#f8805a', '#f8805a', '#f8805a', '#f68d98', '#f68796', '#f6928f', '#f7a581', '#f7b76f', '#f8c361', '#f8bb51', '#f8c458', '#f8bc51', '#f8bc51', '#f8a94c', '#f89248', '#f88846', '#f87e44'];
+(function(root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(['d3'], factory);
+    } else if (typeof exports === 'object' && module.exports) {
+        module.exports = factory(require('d3'));
+    } else {
+        root.returnExports = factory(root.d3);
+    }
+} (this, function(d3) {
+    // exposed methods
+    function circle() {
+        'use strict';
+        // Public variables width default settings
+        var width = 960;
+        var height = 960;
+        var backgroundColor = '#fff';
 
-    function circle(selection) {
-      var radius = Math.min(width, height);
-      var radii = {
-        'sun': radius / 8,
-        'earthOrbit': radius / 2.5,
-        'rect': Math.sqrt(Math.pow(radius * .8, 2) / 2)
-      };
-      selection.each(function () {
-        // tooltip
-        var tooltip = d3.select('body')
-          .append('div')
-          .attr('class', 'tooltip')
-          .style('opacity', 0.0);
-        // Space
-        var svg = d3.select(this).append('svg')
-          .attr('width', width)
-          .attr('height', height)
-          .style('background-color', backgroundColor)
-          .append('g')
-          .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')')
-          .style('background-color', 'red');
+        var value;
 
-        // Area
-        if (areaText) {
-          var sun = svg.append('g')
-            .attr('class', 'sun');
-          var text = sun.append('text')
-            .attr('x', 10)
-            .attr('y', -60)
-            .attr('font-size', 24)
-            .style('fill', textBeforeEdgeColor);
-          text.selectAll('.tspan')
-            .data(defaultData)
-            .enter()
-            .append('tspan')
-            .attr('class', 'tspan')
-            .attr('x', text.attr('x'))
-            .attr('dy', '1em')
-            .text(function (d) {
-              return d;
+        var orbitColor = ['#5185dd', '#4199ca'];
+        var orbitWidth = 1;
+        var trackBall = 12;
+        var ballSize = [12, 24];
+
+        var textAfterEdge = '';
+        var textAfterEdgeColor = '#000';
+        var textAfterEdgeSize = 24;
+        var textAfterEdgeStartOffset = '20%';
+        var textAfterEdgeDxDy = ['15px', '-5px'];
+        var textAfterEdgeDominantBaseline = 'text-after-edge';
+        var textBeforeEdge = '';
+        var textBeforeEdgeColor = '#000';
+        var textBeforeEdgeSize = 20;
+        var textBeforeEdgeStartOffset = '20%'
+        var textBeforeEdgeDxDy = ['30px', '5px'];
+        var textBeforeEdgeDominantBaseline = 'text-before-edge';
+
+        // Private variables
+        var defaultData = ['提供数据总量', 0, '提供数据部委总量', 0, '提供数据部委占比', 0];
+
+        function circle(selection) {
+            var orbitColorScale = d3.scaleLinear()
+                .domain([0, trackBall])
+                .range([orbitColor[0], orbitColor[1]]);
+            var ballSizeScale = d3.scaleLinear()
+                .domain([0, trackBall])
+                .rangeRound([ballSize[1], ballSize[0]]);
+            var radius = Math.min(width, height);
+            var radii = {
+                'sun': radius / 8,
+                'earthOrbit': radius / 2.5,
+                'rectArea': Math.sqrt(Math.pow(radius * .8, 2) / 2)
+            };
+            var tooltip = selection.append('div')
+                .attr('class', 'tooltip')
+                .style('opacity', 0.0);
+
+            selection.each(function() {
+                // Current position of Text in its orbit
+                var textOrbitPosition = d3.arc()
+                    .outerRadius(radii.earthOrbit + 1)
+                    .innerRadius(radii.earthOrbit - 1)
+                    .startAngle(2 * Math.PI * 3 / 4)
+                    .endAngle(2 * Math.PI);
+
+                // Space
+                var svg = d3.select(this).append('svg')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .style('background-color', backgroundColor)
+                    .append('g')
+                    .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+
+                // Sun
+                createRectArea(svg);
+                // Earth's orbit
+                createOrbit(svg);
+
+                if (value) {
+                    createCircle(svg);
+                }
+                createText(svg);
+
+                function render(data) {
+                    // d3.selectAll('.tspan')
+                    //     .data(data)
+                    //     .text(function(d) {
+                    //         return d;
+                    //     });
+                }
+                // 创建圆
+                function createCircle(dom) {
+                    var node = dom.selectAll('.node')
+                        .data(value)
+                        .enter()
+                        .append('g')
+                        .attr('class', 'node');
+                    node.append('circle')
+                        .attr('id', function(d) { return d.id; })
+                        .attr('r', function(d, i) { return ballSizeScale(i); })
+                        .style('fill', function(d, i) { return orbitColorScale(i); });
+                    node.append('clipPath')
+                        .attr('id', function(d) { return 'clip-' + d.id; })
+                        .append('use')
+                        .attr('xlink:href', function(d) { return '#' + d.id; });
+                    node.append('text')
+                        .attr('clip-path', function(d) { return 'url(#clip-' + d.id + ')'; })
+                        .append('tspan')
+                        .attr('x', function(d, i) { return i < 9 ? (-ballSizeScale(i) * .2) : (-ballSizeScale(i) * .4) })
+                        .attr('y', function(d, i) { return ballSizeScale(i) * .2 })
+                        .style('fill', 'white')
+                        .style('font-size', function(d, i) {
+                            return ballSizeScale(i) * .8;
+                        })
+                        .text(function(d, i) {
+                            return i + 1;
+                        });
+                    // node.append('title')
+                    //     .text(function(d) { return d.id; });
+                    // node.append('text')
+                    //     .attr('x', function(d, i, nodes) {
+                    //         return i < 7 ? 50 : -35;
+                    //     })
+                    //     .attr('y', function(d, i, nodes) {
+                    //         return 13 + (i - nodes.length / 2);
+                    //     })
+                    //     .style('fill', 'block')
+                    //     .text(function(d) {
+                    //         return d.name;
+                    //     });
+                    node.each(function(d, i) {
+                        var hudu = (i + 1) * (2 * Math.PI / trackBall);
+                        var X = Math.sin(hudu) * (radii.earthOrbit + ballSizeScale(i));
+                        var Y = Math.cos(hudu) * (radii.earthOrbit + ballSizeScale(i));
+                        d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
+
+                        // d3.select(this).on('click', function(d) {
+                        //     defaultData.splice(1, 1, d.data.zongliang);
+                        //     defaultData.splice(3, 1, d.data.buliang);
+                        //     defaultData.splice(5, 1, d.data.zhanbi);
+                        //     render(defaultData);
+                        // });
+                        // d3.select(this).on('mouseover', function(d) {
+                        //     tooltip.html(d.data.name + '<br />' +
+                        //         '提供数据' + d.data.zongliang + '<br />' +
+                        //         '提供占比' + d.data.zhanbi + '<br />')
+                        //         .style('left', (d3.event.pageX) + 'px')
+                        //         .style('top', (d3.event.pageY + 20) + 'px')
+                        //         .style('opacity', 1.0);
+                        // }).on('mousemove', function(d) {
+                        //     tooltip.style('left', (d3.event.pageX) + 'px')
+                        //         .style('top', (d3.event.pageY + 20) + 'px');
+                        // }).on('mouseout', function(d) {
+                        //     tooltip.style('opacity', 0.0);
+                        // })
+                    });
+                }
+                // 创建文字
+                function createText(dom) {
+                    var circleText = dom.append('g')
+                        .attr('class', 'circleText');
+
+                    circleText.append('path')
+                        .attr('id', 'curve')
+                        .attr('d', textOrbitPosition)
+                        .style('fill', 'none');
+                    circleText.append('text')
+                        .attr('id', 'curve-text-after')
+                        .style('font-size', textAfterEdgeSize)
+                        .attr('fill', textAfterEdgeColor)
+                        .attr('dx', textAfterEdgeDxDy[0])
+                        .attr('dy', textAfterEdgeDxDy[1])
+                        .append('textPath')
+                        .attr('xlink:href', '#curve')
+                        .attr('startOffset', textAfterEdgeStartOffset)
+                        .attr('dominant-baseline', textAfterEdgeDominantBaseline)
+                        .text(textAfterEdge);
+                    circleText.append('text')
+                        .attr('id', 'curve-text-before')
+                        .style('font-size', textBeforeEdgeSize)
+                        .style('fill', textBeforeEdgeColor)
+                        .attr('dx', textBeforeEdgeDxDy[0])
+                        .attr('dy', textBeforeEdgeDxDy[1])
+                        .append('textPath')
+                        .attr('xlink:href', '#curve')
+                        .attr('startOffset', textBeforeEdgeStartOffset)
+                        .attr('dominant-baseline', textBeforeEdgeDominantBaseline)
+                        .text(textBeforeEdge);
+                }
+                // 创建轨道
+                function createOrbit(dom) {
+                    for (var i = 0; i < trackBall; i++) {
+                        dom.append("path")
+                            .attr("class", "earthOrbitPosition")
+                            .attr("d", d3.arc().outerRadius(radii.earthOrbit + orbitWidth / 2).innerRadius(radii.earthOrbit - orbitWidth / 2).startAngle(2 * Math.PI * i / trackBall).endAngle(2 * Math.PI * (i + 1) / trackBall))
+                            .style("fill", orbitColorScale(i));
+                    }
+                }
+                // 创建中心区域图
+                function createRectArea(dom) {
+                    dom.append("circle")
+                        .attr("class", "sun")
+                        .attr("r", radii.sun)
+                        .style("fill", "rgba(255, 204, 0, 1.0)");
+                }
             });
-          render(defaultData);
-        } else if (areaChart) {
-          // TODO
         }
 
-        // Earth's orbit
-        svg.append('circle')
-          .attr('class', 'earthOrbit')
-          .attr('r', radii.earthOrbit)
-          .style('fill', 'none')
-          .style('stroke', orbitColor)
-          .style('stroke-width', orbitWidth);
-
-        // 用最笨的方法模拟圆环渐变
-        simulationBlue(theme);
-
-        // Current position of Text in its orbit
-        var textOrbitPosition = d3.arc()
-          .outerRadius(radii.earthOrbit + 1)
-          .innerRadius(radii.earthOrbit - 1)
-          .startAngle(2 * Math.PI * 3 / 4)
-          .endAngle(2 * Math.PI);
-
-        if (value) {
-          createRightCircle(value);
-          createLeftText();
-        }
-
-        function render(data) {
-          d3.selectAll('.tspan')
-            .data(data)
-            .text(function (d) {
-              return d;
-            });
-        }
-
-        function createRightCircle(data) {
-          var pack = d3.pack().size([width, height]).padding(1);
-          var root = d3.hierarchy({ children: data })
-            .each(function (d) {
-              if (id = d.data.id) {
-                var id;
-                var i = id.lastIndexOf('.');
-                d.id = id;
-                d.package = id.slice(0, i);
-                d.class = id.slice(i + 1);
-                d.name = d.data.name;
-              }
-            });
-
-          var node = svg.selectAll('.node')
-            .data(pack(root).leaves()) //在这里使用 pack(root)和未使用时感觉没区别呀！
-            .enter()
-            .append('g')
-            .attr('class', 'node');
-          node.append('circle')
-            .attr('id', function (d) { return d.id; })
-            .attr('r', function (d, i) {
-              return (
-                radius / 16 * Math.pow(0.92, i));
-            })
-            .style('fill', function (d, i) {
-              if (theme == 'blue') {
-                return blueCircle[i];
-              } else {
-                return orangeCircle[i];
-              }
-            });
-          node.append('clipPath')
-            .attr('id', function (d) { return 'clip-' + d.id; })
-            .append('use')
-            .attr('xlink:href', function (d) { return '#' + d.id; });
-          node.append('text')
-            .attr('clip-path', function (d) { return 'url(#clip-' + d.id + ')'; })
-            .selectAll('tspan')
-            .data(function (d) { return d.class.split(/(?=[A-Z][^A-Z])/g); })
-            .enter()
-            .append('tspan')
-            .attr('x', 0)
-            .attr('y', 12)
-            .style('fill', 'white')
-            .style('font-size', function (d) {
-              return 32;
-            })
-            .text(function (d) { return d; });
-          node.append('title')
-            .text(function (d) { return d.id; });
-          node.append('text')
-            .attr('x', function (d, i, nodes) {
-              return i < 7 ? 50 : -35;
-            })
-            .attr('y', function (d, i, nodes) {
-              return 13 + (i - nodes.length / 2);
-            })
-            .style('fill', 'block')
-            .text(function (d) {
-              return d.name;
-            });
-          node.each(function (d, i) {
-            var hudu = (i + 1) * (2 * Math.PI / rad);
-            var X = Math.sin(hudu) * radii.earthOrbit;
-            var Y = Math.cos(hudu) * radii.earthOrbit;
-            d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
-
-            d3.select(this).on('click', function (d) {
-              defaultData.splice(1, 1, d.data.zongliang);
-              defaultData.splice(3, 1, d.data.buliang);
-              defaultData.splice(5, 1, d.data.zhanbi);
-              render(defaultData);
-            });
-            d3.select(this).on('mouseover', function (d) {
-              tooltip.html(d.data.name + '<br />' +
-                '提供数据' + d.data.zongliang + '<br />' +
-                '提供占比' + d.data.zhanbi + '<br />')
-                .style('left', (d3.event.pageX) + 'px')
-                .style('top', (d3.event.pageY + 20) + 'px')
-                .style('opacity', 1.0);
-            }).on('mousemove', function (d) {
-              tooltip.style('left', (d3.event.pageX) + 'px')
-                .style('top', (d3.event.pageY + 20) + 'px');
-            }).on('mouseout', function (d) {
-              tooltip.style('opacity', 0.0);
-            })
-          });
-        }
-
-        function createLeftText() {
-          var circleText = svg.append('g')
-            .attr('class', 'circleText');
-
-          circleText.append('path')
-            .attr('id', 'curve')
-            .attr('d', textOrbitPosition)
-            .style('fill', 'none');
-          circleText.append('text')
-            .attr('id', 'curve-text-after')
-            .style('font-size', textAfterEdgeSize)
-            .attr('fill', textAfterEdgeColor)
-            .style('font-weight', 'bold')
-            .attr('dx', '15px')
-            .attr('dy', '-10px')
-            .append('textPath')
-            .attr('xlink:href', '#curve')
-            .style('text-anchor', 'left')
-            .attr('startOffset', '20%')
-            .attr('dominant-baseline', 'text-after-edge')
-            .text(textAfterEdge);
-          circleText.append('text')
-            .attr('id', 'curve-text-before')
-            .style('font-size', textBeforeEdgeSize)
-            .style('fill', textBeforeEdgeColor)
-            .style('font-weight', 'bold')
-            .attr('dx', '30px')
-            .attr('dy', '10px')
-            .append('textPath')
-            .attr('xlink:href', '#curve')
-            .style('text-anchor', 'left')
-            .attr('startOffset', '20%')
-            .attr('dominant-baseline', 'text-before-edge')
-            .text(textBeforeEdge);
-        }
-
-        function simulationBlue(theme) {
-          if (theme == 'blue') {
-            for (var i = 0; i < blueCircle.length; i++) {
-              svg.append("path").attr("class", "earthOrbitPosition").attr("d", d3.arc().outerRadius(radii.earthOrbit + 2).innerRadius(radii.earthOrbit - 2).startAngle(i * 2 * Math.PI / blueCircle.length).endAngle((i + 1) * 2 * Math.PI / blueCircle.length)).style("fill", blueCircle[i]);
+        // Getter/setter function
+        circle.width = function(_) {
+            if (!arguments.length) {
+                return width;
             }
-          } else {
-            for (var i = 0; i < orangeCircle.length; i++) {
-              svg.append("path").attr("class", "earthOrbitPosition").attr("d", d3.arc().outerRadius(radii.earthOrbit + 2).innerRadius(radii.earthOrbit - 2).startAngle(i * 2 * Math.PI / orangeCircle.length).endAngle((i + 1) * 2 * Math.PI / orangeCircle.length)).style("fill", orangeCircle[i]);
+            width = _;
+            return circle;
+        };
+        circle.height = function(_) {
+            if (!arguments.length) {
+                return height;
             }
-          }
+            height = _;
+            return circle;
+        };
+        circle.backgroundColor = function(_) {
+            if (!arguments.length) {
+                return backgroundColor;
+            }
+            backgroundColor = _;
+            return circle;
+        };
+        circle.value = function(_) {
+            if (!arguments.length) {
+                return value;
+            }
+            value = _;
+            return circle;
+        };
+        circle.orbitColor = function(_) {
+            if (!arguments.length) {
+                return orbitColor;
+            }
+            orbitColor = _;
+            return circle;
+        };
+        circle.orbitWidth = function(_) {
+            if (!arguments.length) {
+                return orbitWidth;
+            }
+            orbitWidth = _;
+            return circle;
+        };
+        circle.trackBall = function(_) {
+            if (!arguments.length) {
+                return trackBall;
+            }
+            trackBall = _;
+            return circle;
+        };
+        circle.ballSize = function(_) {
+            if (!arguments.length) {
+                return ballSize;
+            }
+            ballSize = _;
+            return circle;
+        };
+        circle.textAfterEdge = function(_) {
+            if (!arguments.length) {
+                return textAfterEdge;
+            }
+            textAfterEdge = _;
+            return circle;
+        };
+        circle.textAfterEdgeColor = function(_) {
+            if (!arguments.length) {
+                return textAfterEdgeColor;
+            }
+            textAfterEdgeColor = _;
+            return circle;
+        };
+        circle.textAfterEdgeSize = function(_) {
+            if (!arguments.length) {
+                return textAfterEdgeSize;
+            }
+            textAfterEdgeSize = _;
+            return circle;
+        };
+        circle.textAfterEdgeStartOffset = function(_) {
+            if (!arguments.length) {
+                return textAfterEdgeStartOffset;
+            }
+            textAfterEdgeStartOffset = _;
+            return circle;
+        };
+        circle.textAfterEdgeDxDy = function(_) {
+            if (!arguments.length) {
+                return textAfterEdgeDxDy;
+            }
+            textAfterEdgeDxDy = _;
+            return circle;
+        };
+        circle.textAfterEdgeDominantBaseline = function(_) {
+            if (!arguments.length) {
+                return textAfterEdgeDominantBaseline;
+            }
+            textAfterEdgeDominantBaseline = _;
+            return circle;
+        };
+        circle.textBeforeEdge = function(_) {
+            if (!arguments.length) {
+                return textBeforeEdge;
+            }
+            textBeforeEdge = _;
+            return circle;
+        };
+        circle.textBeforeEdgeColor = function(_) {
+            if (!arguments.length) {
+                return textBeforeEdgeColor;
+            }
+            textBeforeEdgeColor = _;
+            return circle;
+        };
+        circle.textBeforeEdgeSize = function(_) {
+            if (!arguments.length) {
+                return textBeforeEdgeSize;
+            }
+            textBeforeEdgeSize = _;
+            return circle;
+        };
+        circle.textBeforeEdgeStartOffset = function(_) {
+            if (!arguments.length) {
+                return textBeforeEdgeStartOffset;
+            }
+            textBeforeEdgeStartOffset = _;
+            return circle;
+        };
+        circle.textBeforeEdgeDxDy = function(_) {
+            if (!arguments.length) {
+                return textBeforeEdgeDxDy;
+            }
+            textBeforeEdgeDxDy = _;
+            return circle;
+        };
+        circle.textBeforeEdgeDominantBaseline = function(_) {
+            if (!arguments.length) {
+                return textBeforeEdgeDominantBaseline;
+            }
+            textBeforeEdgeDominantBaseline = _;
+            return circle;
+        };
 
-        }
-
-      });
+        return circle;
     }
 
-    // Getter/setter function
-    circle.width = function (_) {
-      if (!arguments.length) {
-        return width;
-      }
-      width = _;
-      return circle;
-    };
-    circle.height = function (_) {
-      if (!arguments.length) {
-        return height;
-      }
-      height = _;
-      return circle;
-    };
-    circle.value = function (_) {
-      if (!arguments.length) {
-        return value;
-      }
-      // TODO
-      value = _;
-      return circle;
-    };
-    circle.backgroundColor = function (_) {
-      if (!arguments.length) {
-        return backgroundColor;
-      }
-      backgroundColor = _;
-      return circle;
-    };
-    circle.orbitColor = function (_) {
-      if (!arguments.length) {
-        return orbitColor;
-      }
-      orbitColor = _;
-      return circle;
-    };
-    circle.orbitWidth = function (_) {
-      if (!arguments.length) {
-        return orbitWidth;
-      }
-      orbitWidth = _;
-      return circle;
-    };
-    circle.areaText = function (_) {
-      if (!arguments.length) {
-        return areaText;
-      }
-      areaText = _;
-      areaChart = !_;
-      return circle;
-    };
-    circle.areaChart = function (_) {
-      if (!arguments.length) {
-        return areaChart;
-      }
-      areaChart = _;
-      areaText = !_;
-      return circle;
-    };
-    circle.rad = function (_) {
-      if (!arguments.length) {
-        return rad;
-      }
-      rad = _;
-      return circle;
-    };
-    circle.textAfterEdge = function (_) {
-      if (!arguments.length) {
-        return textAfterEdge;
-      }
-      textAfterEdge = _;
-      return circle;
-    };
-    circle.textAfterEdgeColor = function (_) {
-      if (!arguments.length) {
-        return textAfterEdgeColor;
-      }
-      textAfterEdgeColor = _;
-      return circle;
-    };
-    circle.textAfterEdgeSize = function (_) {
-      if (!arguments.length) {
-        return textAfterEdgeSize;
-      }
-      textAfterEdgeSize = _;
-      return circle;
-    };
-    circle.textBeforeEdge = function (_) {
-      if (!arguments.length) {
-        return textBeforeEdge;
-      }
-      textBeforeEdge = _;
-      return circle;
-    };
-    circle.textBeforeEdgeColor = function (_) {
-      if (!arguments.length) {
-        return textBeforeEdgeColor;
-      }
-      textBeforeEdgeColor = _;
-      return circle;
-    };
-    circle.textBeforeEdgeSize = function (_) {
-      if (!arguments.length) {
-        return textBeforeEdgeSize;
-      }
-      textBeforeEdgeSize = _;
-      return circle;
-    };
-    circle.theme = function (_) {
-      if (!arguments.length) {
-        return theme;
-      }
-      theme = _;
-      return circle;
-    };
-
-    return circle;
-  }
-
-  return window.Circle = Circle;
+    return d3.circle = circle;
 }));
