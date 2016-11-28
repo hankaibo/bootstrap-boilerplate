@@ -19,7 +19,7 @@
 你需要以下环境:
 * node 5.0+
 * Git
-* python 2.7(非必须，有些npm包在windows系统下编译文件时会用到)
+* python 2.7
 
 ## 安装
 
