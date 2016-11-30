@@ -1,0 +1,48 @@
+# 日志
+logs
+*.log
+
+# 运行时产生的数据
+pids
+*.pid
+*.seed
+
+# jscoverage/JSCover 库生成的目录
+lib-cov
+
+# istanbul之类的工具生成的覆盖目录
+coverage
+
+# 编译的二进制插件 (http://nodejs.org/api/addons.html)
+build/Release
+
+# 用户环境变量
+.lock-wscript
+
+# 系统生成文件 #
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Node 文件 #
+/node_modules
+/bower_components
+
+# Coverage 覆盖文件 #
+/coverage/
+
+# Dist 生成的文件 #
+/dist
+/public/__build__/
+/src/*/__build__/
+__build__/**
+.webpack.json
+
+# Doc 文档 #
+/doc/
+
+# IDE 配置文件#
+.idea/
+*.swp
+.vscode/
