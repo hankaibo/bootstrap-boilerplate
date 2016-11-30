@@ -39,6 +39,7 @@
     var textBeforeEdgeDominantBaseline = 'text-before-edge';
 
     // Private variables
+    var acos = 0;
     var defaultData = ['提供数据总量', 0, '提供数据部委总量', 0, '提供数据部委占比', 0];
 
     function circle(selection) {
@@ -51,7 +52,7 @@
       var radius = Math.min(width, height);
       var radii = {
         'sun': radius / 8,
-        'earthOrbit': radius / 2.5,
+        'earthOrbit': radius / 3,
         'rectArea': Math.sqrt(Math.pow(radius * .8, 2) / 2)
       };
       var tooltip = selection.append('div')
@@ -133,6 +134,20 @@
             var Y = Math.cos(hudu) * (radii.earthOrbit + ballSizeScale(i));
             d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
 
+            var a, b, c;
+            a = radii.earthOrbit + ballSizeScale(i);
+            b = radii.earthOrbit + ballSizeScale(i + 1);
+            c = ballSizeScale(i) + ballSizeScale(i + 1);
+            // console.log('a----->' + a);
+            // console.log('b----->' + b);
+            // console.log('c----->' + c);
+            var cosc = (Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b);
+            acos += Math.acos(cosc);
+
+            var X1 = Math.sin(acos) * (radii.earthOrbit + ballSizeScale(i));
+            var Y1 = Math.cos(acos) * (radii.earthOrbit + ballSizeScale(i));
+            d3.select(this).attr('transform', 'translate(' + X1 + ',' + -Y1 + ')');
+
             // d3.select(this).on('click', function(d) {
             //     defaultData.splice(1, 1, d.data.zongliang);
             //     defaultData.splice(3, 1, d.data.buliang);
@@ -199,7 +214,7 @@
           dom.append("circle")
             .attr("class", "sun")
             .attr("r", radii.sun)
-            .style("fill", "rgba(255, 204, 0, 1.0)");
+            .style("fill", "nine");
         }
       });
     }
