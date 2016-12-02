@@ -24,6 +24,7 @@
     var orbitWidth = 1;
     var trackBall = 12;
     var ballSize = [12, 24];
+    var isEquant = true;
 
     var textAfterEdge = '';
     var textAfterEdgeColor = '#000';
@@ -40,7 +41,6 @@
 
     // Private variables
     var acos = 0;
-    var defaultData = ['提供数据总量', 0, '提供数据部委总量', 0, '提供数据部委占比', 0];
 
     function circle(selection) {
       var orbitColorScale = d3.scaleLinear()
@@ -94,20 +94,31 @@
         }
         // 创建圆
         function createCircle(dom) {
-          var node = dom.selectAll('.node')
+          var nodeEnter = dom.selectAll('g.node')
             .data(value)
             .enter()
             .append('g')
             .attr('class', 'node');
-          node.append('circle')
+
+          var nodeExit = dom.selectAll('g.node')
+            .data(value)
+            .exit()
+            .remove();
+
+          var nodeData = dom.selectAll('g.node')
+            .data(value);
+          nodeData.append('circle')
+            .attr('class', 'node-circle')
             .attr('id', function (d) { return d.id; })
             .attr('r', function (d, i) { return ballSizeScale(i); })
             .style('fill', function (d, i) { return orbitColorScale(i); });
-          node.append('clipPath')
+          nodeData.append('clipPath')
+            .attr('class', 'node-clipPath')
             .attr('id', function (d) { return 'clip-' + d.id; })
             .append('use')
             .attr('xlink:href', function (d) { return '#' + d.id; });
-          node.append('text')
+          nodeData.append('text')
+            .attr('class', 'node-text-in')
             .attr('clip-path', function (d) { return 'url(#clip-' + d.id + ')'; })
             .append('tspan')
             .attr('x', function (d, i) { return i < 9 ? (-ballSizeScale(i) * .2) : (-ballSizeScale(i) * .4) })
@@ -115,45 +126,40 @@
             .style('fill', 'white')
             .style('font-size', function (d, i) { return ballSizeScale(i) * .8; })
             .text(function (d, i) { return i + 1; });
-          node.append('title')
+          nodeData.append('title')
+            .attr('class', 'node-text-in-title')
             .text(function (d, i) { return i + 1; });
-          // node.append('text')
-          //     .attr('x', function(d, i, nodes) {
-          //         return i < 7 ? 50 : -35;
-          //     })
-          //     .attr('y', function(d, i, nodes) {
-          //         return 13 + (i - nodes.length / 2);
-          //     })
-          //     .style('fill', 'block')
-          //     .text(function(d) {
-          //         return d.name;
-          //     });
-          node.each(function (d, i) {
-            var hudu = (i + 0) * (2 * Math.PI / trackBall);
-            var X = Math.sin(hudu) * (radii.earthOrbit + ballSizeScale(i));
-            var Y = Math.cos(hudu) * (radii.earthOrbit + ballSizeScale(i));
-            d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
+          nodeData.append('text')
+            .attr('class', 'node-text-out')
+            .attr('x', function (d, i, nodes) {
+              return i < 7 ? 50 : -35;
+            })
+            .attr('y', function (d, i, nodes) {
+              return 13 + (i - nodes.length / 2);
+            })
+            .style('fill', 'block')
+            .text(function (d) {
+              return d.name;
+            });
+          nodeData.each(function (d, i) {
+            if (isEquant) {
+              var hudu = (i + 0) * (2 * Math.PI / trackBall);
+              var X = Math.sin(hudu) * (radii.earthOrbit + ballSizeScale(i));
+              var Y = Math.cos(hudu) * (radii.earthOrbit + ballSizeScale(i));
+              d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
+            } else {
+              var a, b, c;
+              a = radii.earthOrbit + ballSizeScale(i);
+              b = radii.earthOrbit + ballSizeScale(i + 1);
+              c = ballSizeScale(i) + ballSizeScale(i + 1);
+              var cosc = (Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b);
+              acos += Math.acos(cosc);
 
-            var a, b, c;
-            a = radii.earthOrbit + ballSizeScale(i);
-            b = radii.earthOrbit + ballSizeScale(i + 1);
-            c = ballSizeScale(i) + ballSizeScale(i + 1);
-            // console.log('a----->' + a);
-            // console.log('b----->' + b);
-            // console.log('c----->' + c);
-            var cosc = (Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b);
-            acos += Math.acos(cosc);
+              var X1 = Math.sin(acos) * (radii.earthOrbit + ballSizeScale(i));
+              var Y1 = Math.cos(acos) * (radii.earthOrbit + ballSizeScale(i));
+              d3.select(this).attr('transform', 'translate(' + X1 + ',' + -Y1 + ')');
+            }
 
-            var X1 = Math.sin(acos) * (radii.earthOrbit + ballSizeScale(i));
-            var Y1 = Math.cos(acos) * (radii.earthOrbit + ballSizeScale(i));
-            d3.select(this).attr('transform', 'translate(' + X1 + ',' + -Y1 + ')');
-
-            // d3.select(this).on('click', function(d) {
-            //     defaultData.splice(1, 1, d.data.zongliang);
-            //     defaultData.splice(3, 1, d.data.buliang);
-            //     defaultData.splice(5, 1, d.data.zhanbi);
-            //     render(defaultData);
-            // });
             d3.select(this).on('mouseover', function (d) {
               tooltip.html(d.name + '<br />' +
                 '排名' + d.ranking + '<br />')
@@ -274,6 +280,13 @@
         return ballSize;
       }
       ballSize = _;
+      return circle;
+    };
+    circle.isEquant = function (_) {
+      if (!arguments.length) {
+        return isEquant;
+      }
+      isEquant = _;
       return circle;
     };
     circle.textAfterEdge = function (_) {

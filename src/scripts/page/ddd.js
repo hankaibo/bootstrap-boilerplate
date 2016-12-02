@@ -15,7 +15,7 @@ require('jquery');
 require('bootstrap');
 require('metisMenu');
 require('../common/sb-admin-2.js');
-// require('../common/d3-demo.js');
+require('../common/d3-demo.js');
 
 var d3 = require('d3');
 require('../common/d3-circle.js');
@@ -54,7 +54,7 @@ var value = [
   { id: 30, ranking: 30, name: '活塞' },
 ]
 
-d3.select('.d3-circle').call(d3.circle()
+var circle = d3.circle()
   .width(720) // 长度
   .height(720) // 宽度
   .backgroundColor('#fff') // 画布的背景色
@@ -75,4 +75,10 @@ d3.select('.d3-circle').call(d3.circle()
   .textBeforeEdgeStartOffset('31%') // 左上角内文字开始点
   .textBeforeEdgeDxDy(['30px', '-20px']) // 左上角外文字的dx dy
   .textBeforeEdgeDominantBaseline('text-before-edge') // 左上角内文字的基线？这个属性没清楚。
-);
+d3.select('.d3-circle').call(circle);
+
+setInterval(function () {
+  console.log(new Date());
+  d3.select('.d3-circle').call(circle.value([
+    { id: 1, ranking: 1, name: '猛龙' }]));
+}, 5000)
