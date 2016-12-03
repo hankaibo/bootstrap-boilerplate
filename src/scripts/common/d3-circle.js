@@ -14,58 +14,74 @@
   function circle() {
     'use strict';
     // Public variables width default settings
-    var width = 960;
-    var height = 960;
+    var width = 720;
+    var height = 720;
     var backgroundColor = '#fff';
-
     var value;
-
+    var isClockwise = true;
     var orbitColor = ['#5185dd', '#4199ca'];
     var orbitWidth = 1;
     var trackBall = 12;
     var ballSize = [12, 24];
     var isEquant = true;
+    var ballTextOutSize = 12;
+    var firstQuadrantDominantBaseline = 'text-before-edge';
+    var firstQuadrantTextAnchor = 'end';
+    var secondQuadrantDominantBaseline = 'text-after-edge';
+    var secondQuadrantTextAnchor = 'end';
+    var thirdQuadrantDominantBaseline = 'text-after-edge';
+    var thirdQuadrantTextAnchor = 'start';
+    var fourthQuadrantDominantBaseline = 'text-before-edge';
+    var fourthQuadrantTextAnchor = 'start';
 
+    var textPathArc = [2 * Math.PI * .75, 2 * Math.PI];
     var textAfterEdge = '';
     var textAfterEdgeColor = '#000';
     var textAfterEdgeSize = 24;
-    var textAfterEdgeStartOffset = '20%';
-    var textAfterEdgeDxDy = ['15px', '-5px'];
+    var textAfterEdgeStartOffset = '0';
+    var textAfterTextAnchor = 'start';
     var textAfterEdgeDominantBaseline = 'text-after-edge';
     var textBeforeEdge = '';
     var textBeforeEdgeColor = '#000';
-    var textBeforeEdgeSize = 20;
-    var textBeforeEdgeStartOffset = '20%'
-    var textBeforeEdgeDxDy = ['30px', '5px'];
+    var textBeforeEdgeSize = 18;
+    var textBeforeEdgeStartOffset = '0'
+    var textBeforeTextAnchor = 'start';
     var textBeforeEdgeDominantBaseline = 'text-before-edge';
 
     // Private variables
-    var acos = 0;
+    var a;
+    var b;
+    var c;
+    var cosc;
+    var hudu = 0;
+    var X;
+    var Y;
+    var x;
+    var y;
 
     function circle(selection) {
-      var orbitColorScale = d3.scaleLinear()
-        .domain([0, trackBall])
-        .range([orbitColor[0], orbitColor[1]]);
-      var ballSizeScale = d3.scaleLinear()
-        .domain([0, trackBall])
-        .rangeRound([ballSize[1], ballSize[0]]);
-      var radius = Math.min(width, height);
-      var radii = {
-        'sun': radius / 8,
-        'earthOrbit': radius / 3,
-        'rectArea': Math.sqrt(Math.pow(radius * .8, 2) / 2)
-      };
-      var tooltip = selection.append('div')
-        .attr('class', 'tooltip')
-        .style('opacity', 0.0);
-
       selection.each(function () {
+        var orbitColorScale = d3.scaleLinear()
+          .domain([0, trackBall])
+          .range([orbitColor[0], orbitColor[1]]);
+        var ballSizeScale = d3.scaleLinear()
+          .domain([0, trackBall])
+          .rangeRound([ballSize[1], ballSize[0]]);
+        var radius = Math.min(width, height);
+        var radii = {
+          'sun': radius / 8,
+          'earthOrbit': radius / 3,
+          'rectArea': Math.sqrt(Math.pow(radius * .8, 2) / 2)
+        };
+        var tooltip = selection.append('div')
+          .attr('class', 'tooltip')
+          .style('opacity', 0.0);
         // Current position of Text in its orbit
         var textOrbitPosition = d3.arc()
           .outerRadius(radii.earthOrbit + 1)
           .innerRadius(radii.earthOrbit - 1)
-          .startAngle(2 * Math.PI * 3 / 4)
-          .endAngle(2 * Math.PI);
+          .startAngle(textPathArc[0])
+          .endAngle(textPathArc[1]);
 
         // Space
         var svg = d3.select(this).append('svg')
@@ -121,8 +137,8 @@
             .attr('class', 'node-text-in')
             .attr('clip-path', function (d) { return 'url(#clip-' + d.id + ')'; })
             .append('tspan')
-            .attr('x', function (d, i) { return i < 9 ? (-ballSizeScale(i) * .2) : (-ballSizeScale(i) * .4) })
-            .attr('y', function (d, i) { return ballSizeScale(i) * .2 })
+            .attr('x', function (d, i) { return i < 9 ? (-ballSizeScale(i) * .25) : (-ballSizeScale(i) * .5) })
+            .attr('y', function (d, i) { return ballSizeScale(i) * .25 })
             .style('fill', 'white')
             .style('font-size', function (d, i) { return ballSizeScale(i) * .8; })
             .text(function (d, i) { return i + 1; });
@@ -131,34 +147,34 @@
             .text(function (d, i) { return i + 1; });
           nodeData.append('text')
             .attr('class', 'node-text-out')
-            .attr('x', function (d, i, nodes) {
-              return i < 7 ? 50 : -35;
-            })
-            .attr('y', function (d, i, nodes) {
-              return 13 + (i - nodes.length / 2);
-            })
+            .attr('x', 0)
+            .attr('y', 0)
             .style('fill', 'block')
-            .text(function (d) {
-              return d.name;
-            });
+            .style('font-size', function (d, i) { return ballTextOutSize; })
+            .text(function (d) { return d.name; });
           nodeData.each(function (d, i) {
             if (isEquant) {
-              var hudu = (i + 0) * (2 * Math.PI / trackBall);
-              var X = Math.sin(hudu) * (radii.earthOrbit + ballSizeScale(i));
-              var Y = Math.cos(hudu) * (radii.earthOrbit + ballSizeScale(i));
-              d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
+              hudu = (i + 0) * (2 * Math.PI / trackBall);
             } else {
-              var a, b, c;
-              a = radii.earthOrbit + ballSizeScale(i);
-              b = radii.earthOrbit + ballSizeScale(i + 1);
-              c = ballSizeScale(i) + ballSizeScale(i + 1);
-              var cosc = (Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b);
-              acos += Math.acos(cosc);
-
-              var X1 = Math.sin(acos) * (radii.earthOrbit + ballSizeScale(i));
-              var Y1 = Math.cos(acos) * (radii.earthOrbit + ballSizeScale(i));
-              d3.select(this).attr('transform', 'translate(' + X1 + ',' + -Y1 + ')');
+              if (i == 0) {
+                d3.select(this).attr('transform', 'translate(' + 0 + ',' + -(radii.earthOrbit + ballSizeScale(i)) + ')');
+              } else {
+                a = radii.earthOrbit + ballSizeScale(i);
+                b = radii.earthOrbit + ballSizeScale(i + 1);
+                c = ballSizeScale(i) + ballSizeScale(i + 1);
+                cosc = (Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b);
+                hudu += Math.acos(cosc);
+              }
             }
+            X = Math.sin(isClockwise ? hudu : (2 * Math.PI - hudu)) * (radii.earthOrbit + ballSizeScale(i));
+            Y = Math.cos(isClockwise ? hudu : (2 * Math.PI - hudu)) * (radii.earthOrbit + ballSizeScale(i));
+            d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
+            x = Math.sin(isClockwise ? (2 * Math.PI - hudu) : hudu) * ballSizeScale(i);
+            y = Math.cos(isClockwise ? (2 * Math.PI - hudu) : hudu) * ballSizeScale(i);
+            var nodeTextOut = d3.select(this).select('text.node-text-out')
+              .attr('transform', 'translate(' + x + ',' + y + ')');
+            // setTextOfcircle(nodeTextOut, acos);
+            setTextOfcircle(nodeTextOut, isClockwise ? hudu : (2 * Math.PI - hudu));
 
             d3.select(this).on('mouseover', function (d) {
               tooltip.html(d.name + '<br />' +
@@ -174,23 +190,50 @@
             })
           });
         }
+        // 小圆文字布局
+        function setTextOfcircle(dom, hudu) {
+          // 四象限设置
+          if (hudu > 0 && hudu < Math.PI * .5) {
+            execTextOfcircleLayout(dom, firstQuadrantDominantBaseline, firstQuadrantTextAnchor);
+          } else if (hudu < Math.PI * 1) {
+            execTextOfcircleLayout(dom, secondQuadrantDominantBaseline, secondQuadrantTextAnchor);
+          } else if (hudu < Math.PI * 1.5) {
+            execTextOfcircleLayout(dom, thirdQuadrantDominantBaseline, thirdQuadrantTextAnchor);
+          } else {
+            execTextOfcircleLayout(dom, fourthQuadrantDominantBaseline, fourthQuadrantTextAnchor);
+          }
+          // 对特殊角度进行单独设置
+          if (hudu == 0 || hudu == 2 * Math.PI) {
+            execTextOfcircleLayout(dom, 'text-before-edge', 'middle');
+          } else if (hudu == Math.PI * .5) {
+            execTextOfcircleLayout(dom, 'central', 'end');
+          } else if (hudu == Math.PI * 1) {
+            execTextOfcircleLayout(dom, 'text-after-edge', 'middle');
+          } else if (hudu == Math.PI * 1.5) {
+            execTextOfcircleLayout(dom, 'central', 'start');
+          }
+        }
+        // 小圆文字布局
+        function execTextOfcircleLayout(dom, baseline, textAnchor) {
+          dom.attr('dominant-baseline', baseline)
+            .attr('text-anchor', textAnchor);
+        }
         // 创建文字
         function createText(dom) {
           var circleText = dom.append('g')
             .attr('class', 'circleText');
 
           circleText.append('path')
-            .attr('id', 'curve')
+            .attr('id', 'curve_' + Math.random())
             .attr('d', textOrbitPosition)
             .style('fill', 'none');
           circleText.append('text')
             .attr('id', 'curve-text-after')
             .style('font-size', textAfterEdgeSize)
             .attr('fill', textAfterEdgeColor)
-            .attr('dx', textAfterEdgeDxDy[0])
-            .attr('dy', textAfterEdgeDxDy[1])
             .append('textPath')
-            .attr('xlink:href', '#curve')
+            .attr('xlink:href', '#' + circleText.select('path').attr('id'))
+            .attr('text-anchor', textAfterTextAnchor)
             .attr('startOffset', textAfterEdgeStartOffset)
             .attr('dominant-baseline', textAfterEdgeDominantBaseline)
             .text(textAfterEdge);
@@ -198,10 +241,9 @@
             .attr('id', 'curve-text-before')
             .style('font-size', textBeforeEdgeSize)
             .style('fill', textBeforeEdgeColor)
-            .attr('dx', textBeforeEdgeDxDy[0])
-            .attr('dy', textBeforeEdgeDxDy[1])
             .append('textPath')
-            .attr('xlink:href', '#curve')
+            .attr('xlink:href', '#' + circleText.select('path').attr('id'))
+            .attr('text-anchor', textBeforeTextAnchor)
             .attr('startOffset', textBeforeEdgeStartOffset)
             .attr('dominant-baseline', textBeforeEdgeDominantBaseline)
             .text(textBeforeEdge);
@@ -220,7 +262,7 @@
           dom.append("circle")
             .attr("class", "sun")
             .attr("r", radii.sun)
-            .style("fill", "nine");
+            .style("fill", "none");
         }
       });
     }
@@ -252,6 +294,13 @@
         return value;
       }
       value = _;
+      return circle;
+    };
+    circle.isClockwise = function (_) {
+      if (!arguments.length) {
+        return isClockwise;
+      }
+      isClockwise = _;
       return circle;
     };
     circle.orbitColor = function (_) {
@@ -289,6 +338,76 @@
       isEquant = _;
       return circle;
     };
+    circle.ballTextOutSize = function (_) {
+      if (!arguments.length) {
+        return ballTextOutSize;
+      }
+      ballTextOutSize = _;
+      return circle;
+    };
+    circle.firstQuadrantDominantBaseline = function (_) {
+      if (!arguments.length) {
+        return firstQuadrantDominantBaseline;
+      }
+      firstQuadrantDominantBaseline = _;
+      return circle;
+    }
+    circle.firstQuadrantTextAnchor = function (_) {
+      if (!arguments.length) {
+        return firstQuadrantTextAnchor;
+      }
+      firstQuadrantTextAnchor = _;
+      return circle;
+    }
+    circle.secondQuadrantDominantBaseline = function (_) {
+      if (!arguments.length) {
+        return secondQuadrantDominantBaseline;
+      }
+      secondQuadrantDominantBaseline = _;
+      return circle;
+    }
+    circle.secondQuadrantTextAnchor = function (_) {
+      if (!arguments.length) {
+        return secondQuadrantTextAnchor;
+      }
+      secondQuadrantTextAnchor = _;
+      return circle;
+    }
+    circle.thirdQuadrantDominantBaseline = function (_) {
+      if (!arguments.length) {
+        return thirdQuadrantDominantBaseline;
+      }
+      thirdQuadrantDominantBaseline = _;
+      return circle;
+    }
+    circle.thirdQuadrantTextAnchor = function (_) {
+      if (!arguments.length) {
+        return thirdQuadrantTextAnchor;
+      }
+      thirdQuadrantTextAnchor = _;
+      return circle;
+    }
+    circle.fourthQuadrantDominantBaseline = function (_) {
+      if (!arguments.length) {
+        return fourthQuadrantDominantBaseline;
+      }
+      fourthQuadrantDominantBaseline = _;
+      return circle;
+    }
+    circle.fourthQuadrantTextAnchor = function (_) {
+      if (!arguments.length) {
+        return fourthQuadrantTextAnchor;
+      }
+      fourthQuadrantTextAnchor = _;
+      return circle;
+    }
+    circle.textPathArc = function (_) {
+      if (!arguments.length) {
+        return textPathArc;
+      }
+      textPathArc = _;
+      return circle;
+    };
     circle.textAfterEdge = function (_) {
       if (!arguments.length) {
         return textAfterEdge;
@@ -317,11 +436,11 @@
       textAfterEdgeStartOffset = _;
       return circle;
     };
-    circle.textAfterEdgeDxDy = function (_) {
+    circle.textAfterTextAnchor = function (_) {
       if (!arguments.length) {
-        return textAfterEdgeDxDy;
+        return textAfterTextAnchor;
       }
-      textAfterEdgeDxDy = _;
+      textAfterTextAnchor = _;
       return circle;
     };
     circle.textAfterEdgeDominantBaseline = function (_) {
@@ -359,11 +478,11 @@
       textBeforeEdgeStartOffset = _;
       return circle;
     };
-    circle.textBeforeEdgeDxDy = function (_) {
+    circle.textBeforeTextAnchor = function (_) {
       if (!arguments.length) {
-        return textBeforeEdgeDxDy;
+        return textBeforeTextAnchor;
       }
-      textBeforeEdgeDxDy = _;
+      textBeforeTextAnchor = _;
       return circle;
     };
     circle.textBeforeEdgeDominantBaseline = function (_) {
