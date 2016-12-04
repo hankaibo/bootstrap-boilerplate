@@ -13,7 +13,7 @@
   // exposed methods
   function circle() {
     'use strict';
-    // Public variables width default settings
+    // Public variables with default settings
     var width = 720;
     var height = 720;
     var backgroundColor = '#fff';
@@ -59,7 +59,7 @@
     var x;
     var y;
 
-    function circle(selection) {
+    function chart(selection) {
       selection.each(function () {
         var orbitColorScale = d3.scaleLinear()
           .domain([0, trackBall])
@@ -268,232 +268,232 @@
     }
 
     // Getter/setter function
-    circle.width = function (_) {
+    chart.width = function (_) {
       if (!arguments.length) {
         return width;
       }
       width = _;
-      return circle;
+      return chart;
     };
-    circle.height = function (_) {
+    chart.height = function (_) {
       if (!arguments.length) {
         return height;
       }
       height = _;
-      return circle;
+      return chart;
     };
-    circle.backgroundColor = function (_) {
+    chart.backgroundColor = function (_) {
       if (!arguments.length) {
         return backgroundColor;
       }
       backgroundColor = _;
-      return circle;
+      return chart;
     };
-    circle.value = function (_) {
+    chart.value = function (_) {
       if (!arguments.length) {
         return value;
       }
       value = _;
-      return circle;
+      return chart;
     };
-    circle.isClockwise = function (_) {
+    chart.isClockwise = function (_) {
       if (!arguments.length) {
         return isClockwise;
       }
       isClockwise = _;
-      return circle;
+      return chart;
     };
-    circle.orbitColor = function (_) {
+    chart.orbitColor = function (_) {
       if (!arguments.length) {
         return orbitColor;
       }
       orbitColor = _;
-      return circle;
+      return chart;
     };
-    circle.orbitWidth = function (_) {
+    chart.orbitWidth = function (_) {
       if (!arguments.length) {
         return orbitWidth;
       }
       orbitWidth = _;
-      return circle;
+      return chart;
     };
-    circle.trackBall = function (_) {
+    chart.trackBall = function (_) {
       if (!arguments.length) {
         return trackBall;
       }
       trackBall = _;
-      return circle;
+      return chart;
     };
-    circle.ballSize = function (_) {
+    chart.ballSize = function (_) {
       if (!arguments.length) {
         return ballSize;
       }
       ballSize = _;
-      return circle;
+      return chart;
     };
-    circle.isEquant = function (_) {
+    chart.isEquant = function (_) {
       if (!arguments.length) {
         return isEquant;
       }
       isEquant = _;
-      return circle;
+      return chart;
     };
-    circle.ballTextOutSize = function (_) {
+    chart.ballTextOutSize = function (_) {
       if (!arguments.length) {
         return ballTextOutSize;
       }
       ballTextOutSize = _;
-      return circle;
+      return chart;
     };
-    circle.firstQuadrantDominantBaseline = function (_) {
+    chart.firstQuadrantDominantBaseline = function (_) {
       if (!arguments.length) {
         return firstQuadrantDominantBaseline;
       }
       firstQuadrantDominantBaseline = _;
-      return circle;
+      return chart;
     }
-    circle.firstQuadrantTextAnchor = function (_) {
+    chart.firstQuadrantTextAnchor = function (_) {
       if (!arguments.length) {
         return firstQuadrantTextAnchor;
       }
       firstQuadrantTextAnchor = _;
-      return circle;
+      return chart;
     }
-    circle.secondQuadrantDominantBaseline = function (_) {
+    chart.secondQuadrantDominantBaseline = function (_) {
       if (!arguments.length) {
         return secondQuadrantDominantBaseline;
       }
       secondQuadrantDominantBaseline = _;
-      return circle;
+      return chart;
     }
-    circle.secondQuadrantTextAnchor = function (_) {
+    chart.secondQuadrantTextAnchor = function (_) {
       if (!arguments.length) {
         return secondQuadrantTextAnchor;
       }
       secondQuadrantTextAnchor = _;
-      return circle;
+      return chart;
     }
-    circle.thirdQuadrantDominantBaseline = function (_) {
+    chart.thirdQuadrantDominantBaseline = function (_) {
       if (!arguments.length) {
         return thirdQuadrantDominantBaseline;
       }
       thirdQuadrantDominantBaseline = _;
-      return circle;
+      return chart;
     }
-    circle.thirdQuadrantTextAnchor = function (_) {
+    chart.thirdQuadrantTextAnchor = function (_) {
       if (!arguments.length) {
         return thirdQuadrantTextAnchor;
       }
       thirdQuadrantTextAnchor = _;
-      return circle;
+      return chart;
     }
-    circle.fourthQuadrantDominantBaseline = function (_) {
+    chart.fourthQuadrantDominantBaseline = function (_) {
       if (!arguments.length) {
         return fourthQuadrantDominantBaseline;
       }
       fourthQuadrantDominantBaseline = _;
-      return circle;
+      return chart;
     }
-    circle.fourthQuadrantTextAnchor = function (_) {
+    chart.fourthQuadrantTextAnchor = function (_) {
       if (!arguments.length) {
         return fourthQuadrantTextAnchor;
       }
       fourthQuadrantTextAnchor = _;
-      return circle;
+      return chart;
     }
-    circle.textPathArc = function (_) {
+    chart.textPathArc = function (_) {
       if (!arguments.length) {
         return textPathArc;
       }
       textPathArc = _;
-      return circle;
+      return chart;
     };
-    circle.textAfterEdge = function (_) {
+    chart.textAfterEdge = function (_) {
       if (!arguments.length) {
         return textAfterEdge;
       }
       textAfterEdge = _;
-      return circle;
+      return chart;
     };
-    circle.textAfterEdgeColor = function (_) {
+    chart.textAfterEdgeColor = function (_) {
       if (!arguments.length) {
         return textAfterEdgeColor;
       }
       textAfterEdgeColor = _;
-      return circle;
+      return chart;
     };
-    circle.textAfterEdgeSize = function (_) {
+    chart.textAfterEdgeSize = function (_) {
       if (!arguments.length) {
         return textAfterEdgeSize;
       }
       textAfterEdgeSize = _;
-      return circle;
+      return chart;
     };
-    circle.textAfterEdgeStartOffset = function (_) {
+    chart.textAfterEdgeStartOffset = function (_) {
       if (!arguments.length) {
         return textAfterEdgeStartOffset;
       }
       textAfterEdgeStartOffset = _;
-      return circle;
+      return chart;
     };
-    circle.textAfterTextAnchor = function (_) {
+    chart.textAfterTextAnchor = function (_) {
       if (!arguments.length) {
         return textAfterTextAnchor;
       }
       textAfterTextAnchor = _;
-      return circle;
+      return chart;
     };
-    circle.textAfterEdgeDominantBaseline = function (_) {
+    chart.textAfterEdgeDominantBaseline = function (_) {
       if (!arguments.length) {
         return textAfterEdgeDominantBaseline;
       }
       textAfterEdgeDominantBaseline = _;
-      return circle;
+      return chart;
     };
-    circle.textBeforeEdge = function (_) {
+    chart.textBeforeEdge = function (_) {
       if (!arguments.length) {
         return textBeforeEdge;
       }
       textBeforeEdge = _;
-      return circle;
+      return chart;
     };
-    circle.textBeforeEdgeColor = function (_) {
+    chart.textBeforeEdgeColor = function (_) {
       if (!arguments.length) {
         return textBeforeEdgeColor;
       }
       textBeforeEdgeColor = _;
-      return circle;
+      return chart;
     };
-    circle.textBeforeEdgeSize = function (_) {
+    chart.textBeforeEdgeSize = function (_) {
       if (!arguments.length) {
         return textBeforeEdgeSize;
       }
       textBeforeEdgeSize = _;
-      return circle;
+      return chart;
     };
-    circle.textBeforeEdgeStartOffset = function (_) {
+    chart.textBeforeEdgeStartOffset = function (_) {
       if (!arguments.length) {
         return textBeforeEdgeStartOffset;
       }
       textBeforeEdgeStartOffset = _;
-      return circle;
+      return chart;
     };
-    circle.textBeforeTextAnchor = function (_) {
+    chart.textBeforeTextAnchor = function (_) {
       if (!arguments.length) {
         return textBeforeTextAnchor;
       }
       textBeforeTextAnchor = _;
-      return circle;
+      return chart;
     };
-    circle.textBeforeEdgeDominantBaseline = function (_) {
+    chart.textBeforeEdgeDominantBaseline = function (_) {
       if (!arguments.length) {
         return textBeforeEdgeDominantBaseline;
       }
       textBeforeEdgeDominantBaseline = _;
-      return circle;
+      return chart;
     };
 
-    return circle;
+    return chart;
   }
 
   return d3.circle = circle;
