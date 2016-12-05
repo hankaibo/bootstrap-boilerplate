@@ -11,87 +11,55 @@
   }
 } (this, function (d3) {
   // exposed methods
-  function Circle() {
+  function circle() {
     'use strict';
     // Public variables width default settings
     var width = 960;
     var height = 960;
+    var backgroundColor = '#fff';
+
     var value;
-    var backgroundColor = '#333';
-    var orbitColor = 'rgba(255, 204, 0, 0.75)';
-    var orbitWidth = '1px';
-    var areaText = true;
-    var areaChart = false;
-    var rad = 16;
+
+    var orbitColor = ['#5185dd', '#4199ca'];
+    var orbitWidth = 1;
+    var trackBall = 12;
+    var ballSize = [12, 24];
+
     var textAfterEdge = '';
-    var textAfterEdgeColor = '#fee';
-    var textAfterEdgeSize = '24';
+    var textAfterEdgeColor = '#000';
+    var textAfterEdgeSize = 24;
+    var textAfterEdgeStartOffset = '20%';
+    var textAfterEdgeDxDy = ['15px', '-5px'];
+    var textAfterEdgeDominantBaseline = 'text-after-edge';
     var textBeforeEdge = '';
-    var textBeforeEdgeColor = '#fee';
-    var textBeforeEdgeSize = '24';
-    var defaultData = ['提供数据总量', 0, '提供数据部委总量', 0, '提供数据部委占比', 0];
-    var theme = 'blue';
+    var textBeforeEdgeColor = '#000';
+    var textBeforeEdgeSize = 20;
+    var textBeforeEdgeStartOffset = '20%'
+    var textBeforeEdgeDxDy = ['30px', '5px'];
+    var textBeforeEdgeDominantBaseline = 'text-before-edge';
+
     // Private variables
-    var blueCircle = ['#5185dd', '#626cf7', '#5e69ff', '#3b82ff', '#2a90ff', '#0ca8ff', '#00b2fe', '#01bbe8', '#03c8c9', '#07d0ad', '#07d0ab', '#0dd0a2', '#1bc6a6', '#2db1b5', '#4199ca'];
-    var orangeCircle = ['#f8805a', '#f8805a', '#f8805a', '#f68d98', '#f68796', '#f6928f', '#f7a581', '#f7b76f', '#f8c361', '#f8bb51', '#f8c458', '#f8bc51', '#f8bc51', '#f8a94c', '#f89248', '#f88846', '#f87e44'];
+    var acos = 0;
+    var defaultData = ['提供数据总量', 0, '提供数据部委总量', 0, '提供数据部委占比', 0];
 
     function circle(selection) {
+      var orbitColorScale = d3.scaleLinear()
+        .domain([0, trackBall])
+        .range([orbitColor[0], orbitColor[1]]);
+      var ballSizeScale = d3.scaleLinear()
+        .domain([0, trackBall])
+        .rangeRound([ballSize[1], ballSize[0]]);
       var radius = Math.min(width, height);
       var radii = {
         'sun': radius / 8,
-        'earthOrbit': radius / 2.5,
-        'rect': Math.sqrt(Math.pow(radius * .8, 2) / 2)
+        'earthOrbit': radius / 3,
+        'rectArea': Math.sqrt(Math.pow(radius * .8, 2) / 2)
       };
+      var tooltip = selection.append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0.0);
+
       selection.each(function () {
-        // tooltip
-        var tooltip = d3.select('body')
-          .append('div')
-          .attr('class', 'tooltip')
-          .style('opacity', 0.0);
-        // Space
-        var svg = d3.select(this).append('svg')
-          .attr('width', width)
-          .attr('height', height)
-          .style('background-color', backgroundColor)
-          .append('g')
-          .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')')
-          .style('background-color', 'red');
-
-        // Area
-        if (areaText) {
-          var sun = svg.append('g')
-            .attr('class', 'sun');
-          var text = sun.append('text')
-            .attr('x', 10)
-            .attr('y', -60)
-            .attr('font-size', 24)
-            .style('fill', textBeforeEdgeColor);
-          text.selectAll('.tspan')
-            .data(defaultData)
-            .enter()
-            .append('tspan')
-            .attr('class', 'tspan')
-            .attr('x', text.attr('x'))
-            .attr('dy', '1em')
-            .text(function (d) {
-              return d;
-            });
-          render(defaultData);
-        } else if (areaChart) {
-          // TODO
-        }
-
-        // Earth's orbit
-        svg.append('circle')
-          .attr('class', 'earthOrbit')
-          .attr('r', radii.earthOrbit)
-          .style('fill', 'none')
-          .style('stroke', orbitColor)
-          .style('stroke-width', orbitWidth);
-
-        // 用最笨的方法模拟圆环渐变
-        simulationBlue(theme);
-
         // Current position of Text in its orbit
         var textOrbitPosition = d3.arc()
           .outerRadius(radii.earthOrbit + 1)
@@ -99,97 +67,96 @@
           .startAngle(2 * Math.PI * 3 / 4)
           .endAngle(2 * Math.PI);
 
+        // Space
+        var svg = d3.select(this).append('svg')
+          .attr('width', width)
+          .attr('height', height)
+          .style('background-color', backgroundColor)
+          .append('g')
+          .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+
+        // Sun
+        createRectArea(svg);
+        // Earth's orbit
+        createOrbit(svg);
+
         if (value) {
-          createRightCircle(value);
-          createLeftText();
+          createCircle(svg);
         }
+        createText(svg);
 
         function render(data) {
-          d3.selectAll('.tspan')
-            .data(data)
-            .text(function (d) {
-              return d;
-            });
+          // d3.selectAll('.tspan')
+          //     .data(data)
+          //     .text(function(d) {
+          //         return d;
+          //     });
         }
-
-        function createRightCircle(data) {
-          var pack = d3.pack().size([width, height]).padding(1);
-          var root = d3.hierarchy({ children: data })
-            .each(function (d) {
-              if (id = d.data.id) {
-                var id;
-                var i = id.lastIndexOf('.');
-                d.id = id;
-                d.package = id.slice(0, i);
-                d.class = id.slice(i + 1);
-                d.name = d.data.name;
-              }
-            });
-
-          var node = svg.selectAll('.node')
-            .data(pack(root).leaves()) //在这里使用 pack(root)和未使用时感觉没区别呀！
+        // 创建圆
+        function createCircle(dom) {
+          var node = dom.selectAll('.node')
+            .data(value)
             .enter()
             .append('g')
             .attr('class', 'node');
           node.append('circle')
             .attr('id', function (d) { return d.id; })
-            .attr('r', function (d, i) {
-              return (
-                radius / 16 * Math.pow(0.92, i));
-            })
-            .style('fill', function (d, i) {
-              if (theme == 'blue') {
-                return blueCircle[i];
-              } else {
-                return orangeCircle[i];
-              }
-            });
+            .attr('r', function (d, i) { return ballSizeScale(i); })
+            .style('fill', function (d, i) { return orbitColorScale(i); });
           node.append('clipPath')
             .attr('id', function (d) { return 'clip-' + d.id; })
             .append('use')
             .attr('xlink:href', function (d) { return '#' + d.id; });
           node.append('text')
             .attr('clip-path', function (d) { return 'url(#clip-' + d.id + ')'; })
-            .selectAll('tspan')
-            .data(function (d) { return d.class.split(/(?=[A-Z][^A-Z])/g); })
-            .enter()
             .append('tspan')
-            .attr('x', 0)
-            .attr('y', 12)
+            .attr('x', function (d, i) { return i < 9 ? (-ballSizeScale(i) * .2) : (-ballSizeScale(i) * .4) })
+            .attr('y', function (d, i) { return ballSizeScale(i) * .2 })
             .style('fill', 'white')
-            .style('font-size', function (d) {
-              return 32;
-            })
-            .text(function (d) { return d; });
+            .style('font-size', function (d, i) { return ballSizeScale(i) * .8; })
+            .text(function (d, i) { return i + 1; });
           node.append('title')
-            .text(function (d) { return d.id; });
-          node.append('text')
-            .attr('x', function (d, i, nodes) {
-              return i < 7 ? 50 : -35;
-            })
-            .attr('y', function (d, i, nodes) {
-              return 13 + (i - nodes.length / 2);
-            })
-            .style('fill', 'block')
-            .text(function (d) {
-              return d.name;
-            });
+            .text(function (d, i) { return i + 1; });
+          // node.append('text')
+          //     .attr('x', function(d, i, nodes) {
+          //         return i < 7 ? 50 : -35;
+          //     })
+          //     .attr('y', function(d, i, nodes) {
+          //         return 13 + (i - nodes.length / 2);
+          //     })
+          //     .style('fill', 'block')
+          //     .text(function(d) {
+          //         return d.name;
+          //     });
           node.each(function (d, i) {
-            var hudu = (i + 1) * (2 * Math.PI / rad);
-            var X = Math.sin(hudu) * radii.earthOrbit;
-            var Y = Math.cos(hudu) * radii.earthOrbit;
+            var hudu = (i + 0) * (2 * Math.PI / trackBall);
+            var X = Math.sin(hudu) * (radii.earthOrbit + ballSizeScale(i));
+            var Y = Math.cos(hudu) * (radii.earthOrbit + ballSizeScale(i));
             d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
 
-            d3.select(this).on('click', function (d) {
-              defaultData.splice(1, 1, d.data.zongliang);
-              defaultData.splice(3, 1, d.data.buliang);
-              defaultData.splice(5, 1, d.data.zhanbi);
-              render(defaultData);
-            });
+            var a, b, c;
+            a = radii.earthOrbit + ballSizeScale(i);
+            b = radii.earthOrbit + ballSizeScale(i + 1);
+            c = ballSizeScale(i) + ballSizeScale(i + 1);
+            // console.log('a----->' + a);
+            // console.log('b----->' + b);
+            // console.log('c----->' + c);
+            var cosc = (Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b);
+            acos += Math.acos(cosc);
+
+            var X1 = Math.sin(acos) * (radii.earthOrbit + ballSizeScale(i));
+            var Y1 = Math.cos(acos) * (radii.earthOrbit + ballSizeScale(i));
+            d3.select(this).attr('transform', 'translate(' + X1 + ',' + -Y1 + ')');
+
+            // d3.select(this).on('click', function(d) {
+            //     defaultData.splice(1, 1, d.data.zongliang);
+            //     defaultData.splice(3, 1, d.data.buliang);
+            //     defaultData.splice(5, 1, d.data.zhanbi);
+            //     render(defaultData);
+            // });
             d3.select(this).on('mouseover', function (d) {
-              tooltip.html(d.data.name + '<br />' +
-                '提供数据' + d.data.zongliang + '<br />' +
-                '提供占比' + d.data.zhanbi + '<br />')
+              tooltip.html(d.name + '<br />' +
+                '排名' + d.ranking + '<br />')
                 .style('left', (d3.event.pageX) + 'px')
                 .style('top', (d3.event.pageY + 20) + 'px')
                 .style('opacity', 1.0);
@@ -201,9 +168,9 @@
             })
           });
         }
-
-        function createLeftText() {
-          var circleText = svg.append('g')
+        // 创建文字
+        function createText(dom) {
+          var circleText = dom.append('g')
             .attr('class', 'circleText');
 
           circleText.append('path')
@@ -214,43 +181,41 @@
             .attr('id', 'curve-text-after')
             .style('font-size', textAfterEdgeSize)
             .attr('fill', textAfterEdgeColor)
-            .style('font-weight', 'bold')
-            .attr('dx', '15px')
-            .attr('dy', '-10px')
+            .attr('dx', textAfterEdgeDxDy[0])
+            .attr('dy', textAfterEdgeDxDy[1])
             .append('textPath')
             .attr('xlink:href', '#curve')
-            .style('text-anchor', 'left')
-            .attr('startOffset', '20%')
-            .attr('dominant-baseline', 'text-after-edge')
+            .attr('startOffset', textAfterEdgeStartOffset)
+            .attr('dominant-baseline', textAfterEdgeDominantBaseline)
             .text(textAfterEdge);
           circleText.append('text')
             .attr('id', 'curve-text-before')
             .style('font-size', textBeforeEdgeSize)
             .style('fill', textBeforeEdgeColor)
-            .style('font-weight', 'bold')
-            .attr('dx', '30px')
-            .attr('dy', '10px')
+            .attr('dx', textBeforeEdgeDxDy[0])
+            .attr('dy', textBeforeEdgeDxDy[1])
             .append('textPath')
             .attr('xlink:href', '#curve')
-            .style('text-anchor', 'left')
-            .attr('startOffset', '20%')
-            .attr('dominant-baseline', 'text-before-edge')
+            .attr('startOffset', textBeforeEdgeStartOffset)
+            .attr('dominant-baseline', textBeforeEdgeDominantBaseline)
             .text(textBeforeEdge);
         }
-
-        function simulationBlue(theme) {
-          if (theme == 'blue') {
-            for (var i = 0; i < blueCircle.length; i++) {
-              svg.append("path").attr("class", "earthOrbitPosition").attr("d", d3.arc().outerRadius(radii.earthOrbit + 2).innerRadius(radii.earthOrbit - 2).startAngle(i * 2 * Math.PI / blueCircle.length).endAngle((i + 1) * 2 * Math.PI / blueCircle.length)).style("fill", blueCircle[i]);
-            }
-          } else {
-            for (var i = 0; i < orangeCircle.length; i++) {
-              svg.append("path").attr("class", "earthOrbitPosition").attr("d", d3.arc().outerRadius(radii.earthOrbit + 2).innerRadius(radii.earthOrbit - 2).startAngle(i * 2 * Math.PI / orangeCircle.length).endAngle((i + 1) * 2 * Math.PI / orangeCircle.length)).style("fill", orangeCircle[i]);
-            }
+        // 创建轨道
+        function createOrbit(dom) {
+          for (var i = 0; i < trackBall; i++) {
+            dom.append("path")
+              .attr("class", "earthOrbitPosition")
+              .attr("d", d3.arc().outerRadius(radii.earthOrbit + orbitWidth / 2).innerRadius(radii.earthOrbit - orbitWidth / 2).startAngle(2 * Math.PI * i / trackBall).endAngle(2 * Math.PI * (i + 1) / trackBall))
+              .style("fill", orbitColorScale(i));
           }
-
         }
-
+        // 创建中心区域图
+        function createRectArea(dom) {
+          dom.append("circle")
+            .attr("class", "sun")
+            .attr("r", radii.sun)
+            .style("fill", "nine");
+        }
       });
     }
 
@@ -269,19 +234,18 @@
       height = _;
       return circle;
     };
-    circle.value = function (_) {
-      if (!arguments.length) {
-        return value;
-      }
-      // TODO
-      value = _;
-      return circle;
-    };
     circle.backgroundColor = function (_) {
       if (!arguments.length) {
         return backgroundColor;
       }
       backgroundColor = _;
+      return circle;
+    };
+    circle.value = function (_) {
+      if (!arguments.length) {
+        return value;
+      }
+      value = _;
       return circle;
     };
     circle.orbitColor = function (_) {
@@ -298,27 +262,18 @@
       orbitWidth = _;
       return circle;
     };
-    circle.areaText = function (_) {
+    circle.trackBall = function (_) {
       if (!arguments.length) {
-        return areaText;
+        return trackBall;
       }
-      areaText = _;
-      areaChart = !_;
+      trackBall = _;
       return circle;
     };
-    circle.areaChart = function (_) {
+    circle.ballSize = function (_) {
       if (!arguments.length) {
-        return areaChart;
+        return ballSize;
       }
-      areaChart = _;
-      areaText = !_;
-      return circle;
-    };
-    circle.rad = function (_) {
-      if (!arguments.length) {
-        return rad;
-      }
-      rad = _;
+      ballSize = _;
       return circle;
     };
     circle.textAfterEdge = function (_) {
@@ -342,6 +297,27 @@
       textAfterEdgeSize = _;
       return circle;
     };
+    circle.textAfterEdgeStartOffset = function (_) {
+      if (!arguments.length) {
+        return textAfterEdgeStartOffset;
+      }
+      textAfterEdgeStartOffset = _;
+      return circle;
+    };
+    circle.textAfterEdgeDxDy = function (_) {
+      if (!arguments.length) {
+        return textAfterEdgeDxDy;
+      }
+      textAfterEdgeDxDy = _;
+      return circle;
+    };
+    circle.textAfterEdgeDominantBaseline = function (_) {
+      if (!arguments.length) {
+        return textAfterEdgeDominantBaseline;
+      }
+      textAfterEdgeDominantBaseline = _;
+      return circle;
+    };
     circle.textBeforeEdge = function (_) {
       if (!arguments.length) {
         return textBeforeEdge;
@@ -363,16 +339,30 @@
       textBeforeEdgeSize = _;
       return circle;
     };
-    circle.theme = function (_) {
+    circle.textBeforeEdgeStartOffset = function (_) {
       if (!arguments.length) {
-        return theme;
+        return textBeforeEdgeStartOffset;
       }
-      theme = _;
+      textBeforeEdgeStartOffset = _;
+      return circle;
+    };
+    circle.textBeforeEdgeDxDy = function (_) {
+      if (!arguments.length) {
+        return textBeforeEdgeDxDy;
+      }
+      textBeforeEdgeDxDy = _;
+      return circle;
+    };
+    circle.textBeforeEdgeDominantBaseline = function (_) {
+      if (!arguments.length) {
+        return textBeforeEdgeDominantBaseline;
+      }
+      textBeforeEdgeDominantBaseline = _;
       return circle;
     };
 
     return circle;
   }
 
-  return window.Circle = Circle;
+  return d3.circle = circle;
 }));
