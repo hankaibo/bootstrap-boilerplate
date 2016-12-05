@@ -360,7 +360,38 @@
         </div>
         <!-- /.row -->
         <div class="row">
-          <div class="col-lg-12 d3-circle"></div>
+          <div class="col-lg-6 d3-progress-circular">
+            <style>
+              #main {
+                height: 300px;
+                width: 300px;
+              }
+
+              circle.na {
+                fill: #333;
+              }
+
+              circle.zero {
+                fill: #c00;
+              }
+
+              circle.one {
+                fill: #6c0;
+              }
+            </style>
+            <form oninput="output.value=(input.value/240).toFixed(3)" style="top:10px;left:10px;">
+              <input type="range" min="0" max="240" value="60" style="width:240px;" id="input">
+              <i>k</i>=
+              <output name="output" for="input">0.250</output>
+              <div id="main"></div>
+          </div>
+          <div class="col-lg-6 d3-progress-radial">
+          </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+          <div class="col-lg-6 d3-circle-1"></div>
+          <div class="col-lg-6 d3-circle-2"></div>
         </div>
         <!-- /.row -->
         <div class="row">
