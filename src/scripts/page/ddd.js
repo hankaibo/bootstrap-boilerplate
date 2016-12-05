@@ -15,11 +15,9 @@ require('jquery');
 require('bootstrap');
 require('metisMenu');
 require('../common/sb-admin-2.js');
-require('../common/d3-demo.js');
 
 var d3 = require('d3');
 require('../common/d3-circle.js');
-require('../common/d3-progress-circular.js');
 require('../common/d3-progress-radial.js');
 
 d3.select('.d3-progress-radial').call(
@@ -29,12 +27,6 @@ d3.select('.d3-progress-radial').call(
         .isFilter(true)
 );
 
-// d3.select('#main').call(d3.progressCircular, .25);
-// d3.select('.d3-progress-circular').select('form').on('input', function() {
-//     d3.select('#main').call(d3.progressCircular, +this.output.value);
-// });
-
-// { id: 1, ranking: 1, name: '猛龙' },
 var value = [
     { id: 1, ranking: 1, name: '猛龙' },
     { id: 2, ranking: 2, name: '火箭' },
@@ -65,7 +57,7 @@ var value = [
     { id: 27, ranking: 27, name: '76人' },
     { id: 28, ranking: 28, name: '掘金' },
     { id: 29, ranking: 29, name: '步行者' },
-    { id: 30, ranking: 30, name: '活塞' },
+    { id: 30, ranking: 30, name: '活塞' }
 ]
 
 var circle1 = d3.circle()
