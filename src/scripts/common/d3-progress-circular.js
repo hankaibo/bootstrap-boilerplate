@@ -5,10 +5,10 @@
   } else if (typeof exports === 'object' && module.exports) {
     module.exports = factory(require('d3'));
   } else {
-    root.returnExports = factory(root.d3);
+    root.d3.progressCircular = factory(root.d3);
   }
 } (this, function (d3) {
-  function progressCircular(selection, k) {
+  return function module(selection, k) {
     if (selection) {
       var r = 120;
       var h = 0;
@@ -63,5 +63,4 @@
       return k;
     }
   }
-  return d3.progressCircular = progressCircular;
 }));

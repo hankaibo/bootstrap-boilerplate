@@ -21,18 +21,18 @@ var d3 = require('d3');
 require('../common/d3-circle.js');
 require('../common/d3-progress-circular.js');
 require('../common/d3-progress-radial.js');
+require('../common/demo.js');
 
-d3.select('.d3-progress-radial').call(
-  d3.progressRadial()
-    .backgroundColor('#4f4f4f')
-    .startPosition(2)
-    .isFilter(true)
-);
+var progressRadial1 = d3.progressRadial()
+  .backgroundColor('#4f4f4f')
+  .startPosition(2);
 
-// d3.select('#main').call(d3.progressCircular, .25);
-// d3.select('.d3-progress-circular').select('form').on('input', function() {
-//     d3.select('#main').call(d3.progressCircular, +this.output.value);
-// });
+d3.select('.d3-progress-radial').call(d3.slider());
+
+d3.select('#main').call(d3.progressCircular, .25);
+d3.select('.d3-progress-circular').select('form').on('input', function () {
+  d3.select('#main').call(d3.progressCircular, +this.output.value);
+});
 
 // { id: 1, ranking: 1, name: '猛龙' },
 var value = [

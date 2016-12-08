@@ -8,11 +8,11 @@
   } else if (typeof exports === 'object' && module.exports) {
     module.exports = factory(require('d3'));
   } else {
-    root.returnExports = factory(root.d3)
+    root.d3.slider = factory(root.d3)
   }
 } (this, function (d3) {
   // exposed methods
-  function slider() {
+  return function module() {
     "use strict";
     // Public variables width default settings
     var min = 0,
@@ -390,6 +390,4 @@
 
     return slider;
   }
-
-  return d3.slider = slider;
 }));

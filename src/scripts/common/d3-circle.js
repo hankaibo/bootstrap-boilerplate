@@ -7,11 +7,11 @@
   } else if (typeof exports === 'object' && module.exports) {
     module.exports = factory(require('d3'));
   } else {
-    root.returnExports = factory(root.d3);
+    root.d3.circle = factory(root.d3);
   }
 } (this, function (d3) {
   // exposed methods
-  function circle() {
+  return function module() {
     'use strict';
     // Public variables with default settings
     var width = 720;
@@ -496,5 +496,4 @@
     return chart;
   }
 
-  return d3.circle = circle;
 }));

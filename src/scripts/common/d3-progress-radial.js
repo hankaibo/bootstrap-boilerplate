@@ -5,15 +5,18 @@
   } else if (typeof exports === 'object' && module.exports) {
     module.exports = factory(require('d3'));
   } else {
-    root.returnExports = factory(root.d3);
+    root.d3.progressRadial = factory(root.d3);
   }
 } (this, function (d3) {
   // exposed methods
-  function progressRadial() {
+  return function module() {
+    'use strict';
+
     // Public variables with default settings
     var width = 320;
     var height = 320;
     var backgroundColor = '#fff';
+
     var innerRadius = 100;
     var outerRadius = 105;
     var colors = {
@@ -21,16 +24,22 @@
       'yellow': '#f0ff08',
       'green': '#47e495'
     };
-    var isFilter = true;
+
+    var isFilter = false;
     var startPosition = 0;
+
     var arcBackFill = '#ccc';
     var arcBackFillOpacity = .5;
+
     var arcFrontFill = '#e1499a';
     var arcFrontFillOpacity = 1;
+
     var arcFilterOpacity = 1;
     var arcFilterStrokeWidth = 5;
+
     var numberTextColor = '#fff';
     var numberTextSize = '12';
+
     var startPercent = 0;
     var endPercent = .85;
 
@@ -97,7 +106,9 @@
           .style('font-size', numberTextSize);
 
         function updateProgress(progress) {
-          arcFilter.attr('d', arcFront.endAngle(twoPI * progress));
+          if (isFilter) {
+            arcFilter.attr('d', arcFront.endAngle(twoPI * progress));
+          }
           foreground.attr('d', arcFront.endAngle(twoPI * progress));
           numberText.text(formatPercent(progress));
         }
@@ -112,17 +123,20 @@
           }
         })();
 
-        function generateUUID() {
-          var d = new Date().getTime();
-          var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = (d + Math.random() * 16) % 16 | 0;
-            d = Math.floor(d / 16);
-            return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
-          });
-          return uuid;
-        };
       });
+
     }
+
+    function generateUUID() {
+      var d = new Date().getTime();
+      var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+      });
+      return uuid;
+    };
+
     // Getter/setter function
     chart.width = function (_) {
       if (!arguments.length) {
@@ -151,72 +165,92 @@
       }
       innerRadius = _;
       return chart;
-    }
+    };
     chart.outerRadius = function (_) {
       if (!arguments.length) {
         return outerRadius;
       }
       outerRadius = _;
       return chart;
-    }
+    };
     chart.colors = function (_) {
       if (!arguments.length) {
         return colors;
       }
       colors = _;
       return chart;
-    }
+    };
     chart.isFilter = function (_) {
       if (!arguments.length) {
         return isFilter;
       }
       isFilter = _;
       return chart;
-    }
+    };
     chart.startPosition = function (_) {
       if (!arguments.length) {
         return startPosition;
       }
       startPosition = _;
       return chart;
-    }
+    };
     chart.arcBackFill = function (_) {
       if (!arguments.length) {
         return arcBackFill;
       }
       arcBackFill = _;
       return chart;
-    }
+    };
     chart.arcBackFillOpacity = function (_) {
       if (!arguments.length) {
         return arcBackFillOpacity;
       }
       arcBackFillOpacity = _;
       return chart;
-    }
-    chart.arcFilterColor = function (_) {
+    };
+    chart.arcFrontFill = function (_) {
       if (!arguments.length) {
-        return arcFilterColor;
+        return arcFrontFill;
       }
-      arcFilterColor = _;
+      arcFrontFill = _;
       return chart;
-    }
+    };
+    chart.arcFrontFillOpacity = function (_) {
+      if (!arguments.length) {
+        return arcFrontFillOpacity;
+      }
+      arcFrontFillOpacity = _;
+      return chart;
+    };
     chart.arcFilterOpacity = function (_) {
       if (!arguments.length) {
         return arcFilterOpacity;
       }
       arcFilterOpacity = _;
       return chart;
-    }
+    };
     chart.arcFilterStrokeWidth = function (_) {
       if (!arguments.length) {
         return arcFilterStrokeWidth;
       }
       arcFilterStrokeWidth = _;
       return chart;
-    }
+    };
+    chart.numberTextColor = function (_) {
+      if (!arguments.length) {
+        return numberTextColor;
+      }
+      numberTextColor = _;
+      return chart;
+    };
+    chart.numberTextSize = function (_) {
+      if (!arguments.length) {
+        return numberTextSize;
+      }
+      numberTextSize = _;
+      return chart;
+    };
 
     return chart;
   }
-  return d3.progressRadial = progressRadial;
 }));
