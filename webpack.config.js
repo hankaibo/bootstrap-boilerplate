@@ -1,5 +1,5 @@
 /**
- *@author:hankaibo
+ * @author:hankaibo
  */
 
 var path = require('path');
@@ -84,7 +84,7 @@ module.exports = function makeWebpackConfig() {
   config.devServer = {
     contentBase: './src',
     historyApiFallback: true,
-    quiet: false
+    quiet: true
   };
 
   var pages = Object.keys(helpers.getEntry('src/views/**/*.html', 'src/views/'));

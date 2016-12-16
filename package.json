@@ -1,8 +1,7 @@
 {
   "name": "mybootstrap",
-  "version": "3.0.0",
+  "version": "3.3.7",
   "description": "An open source, admin dashboard template for Bootstrap.",
-  "main": "index.js",
   "scripts": {
     "clean": "rimraf node_modules dist && npm cache clean",
     "clean-install": "npm run clean && npm install",
@@ -14,13 +13,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.oschina.net/hankaibo/mybootstrap.git"
+    "url": "https://github.com/hankaibo/mybootstrap.git"
   },
   "keywords": [
     "webpack bootstrap"
   ],
   "author": "hankaibo",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "bootstrap": "^3.3.7",
     "bootstrap-social": "^5.0.0",

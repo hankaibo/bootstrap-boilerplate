@@ -25,7 +25,7 @@
 
 ```bash
 # 克隆我们的仓库
-$ git clone https://git.oschina.net/hankaibo/mybootstrap.git my-app
+$ git clone https://github.com/hankaibo/mybootstrap.git my-app
 
 # 进入到你的应用目录
 $ cd my-app

@@ -16,42 +16,37 @@
     var width = 320;
     var height = 320;
     var backgroundColor = '#fff';
-
     var innerRadius = 100;
     var outerRadius = 105;
-    var colors = {
-      'pink': '#e1499a',
-      'yellow': '#f0ff08',
-      'green': '#47e495'
-    };
-
+    var color = '#e1499a';
     var isFilter = false;
     var startPosition = 0;
-
     var arcBackFill = '#ccc';
     var arcBackFillOpacity = .5;
-
     var arcFrontFill = '#e1499a';
     var arcFrontFillOpacity = 1;
-
     var arcFilterOpacity = 1;
     var arcFilterStrokeWidth = 5;
-
     var numberTextColor = '#fff';
     var numberTextSize = '12';
+    var numberPercent = .1;
+    var textColor = '#fff';
+    var textSize = '#12';
+    var textValue = 'XXX';
 
     var startPercent = 0;
-    var endPercent = .85;
 
     // Private variables
-    var color = colors.pink;
     var twoPI = Math.PI * 2;
     var formatPercent = d3.format('.0%');
-    var count = Math.abs((endPercent - startPercent) / .01);
-    var step = endPercent < startPercent ? -.01 : .01;
+    var count = 0;
+    var step = 0;
 
     function chart(selection) {
       selection.each(function () {
+        d3.select(this).selectAll('*').remove();
+        count = Math.abs((numberPercent - startPercent) / .01);
+        step = numberPercent < startPercent ? -.01 : .01;
         var arcBack = d3.arc()
           .startAngle(0)
           .endAngle(twoPI)
@@ -99,10 +94,21 @@
           .attr('fill', arcFrontFill)
           .attr('fill-opacity', arcFrontFillOpacity);
 
-        var numberText = meter.append('text')
+        var text = meter.append('text')
+          .attr('text-anchor', 'middel')
+          .attr('transform', 'translate(' + -width / 6 + ',0)');
+
+        text.append('tspan')
+          .attr('class', 'tspan-text')
+          .attr('fill', textColor)
+          // .attr('dx','0')
+          // .attr('dy', '1em')
+          .style('font-size', textSize)
+          .text(textValue);
+        text.append('tspan')
+          .attr('class', 'tspan-number')
           .attr('fill', numberTextColor)
-          .attr('text-anchor', 'middle')
-          .attr('dy', '.35em')
+          // .attr('dy','1em')
           .style('font-size', numberTextSize);
 
         function updateProgress(progress) {
@@ -110,7 +116,7 @@
             arcFilter.attr('d', arcFront.endAngle(twoPI * progress));
           }
           foreground.attr('d', arcFront.endAngle(twoPI * progress));
-          numberText.text(formatPercent(progress));
+          text.select('.tspan-number').text(formatPercent(progress));
         }
         var progress = startPercent;
         (function loops() {
@@ -135,7 +141,59 @@
         return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
       });
       return uuid;
-    };
+    }
+    function appendMultiText(container, str, posX, posY, width, fontsize, fontfamily) {
+
+      if (arguments.length < 6) {
+        fontsize = 14;
+      }
+
+      if (arguments.length < 7) {
+        fontfamily = "simsun, arial";
+      }
+
+      var strs = splitByLine(str, width, fontsize);
+
+      var mulText = container.append("text")
+        .attr("x", posX)
+        .attr("y", posY)
+        .style("font-size", fontsize)
+        .style("font-family", fontfamily);
+
+      mulText.selectAll("tspan")
+        .data(strs)
+        .enter()
+        .append("tspan")
+        .attr("x", mulText.attr("x"))
+        .attr("dy", "1em")
+        .text(function (d) {
+          return d;
+        });
+
+      return mulText;
+
+      function splitByLine(str, max, fontsize) {
+        var curLen = 0;
+        var result = [];
+        var start = 0, end = 0;
+        for (var i = 0; i < str.length; i++) {
+          var code = str.charCodeAt(i);
+          var pixelLen = code > 255 ? fontsize : fontsize / 2;
+          curLen += pixelLen;
+          if (curLen > max) {
+            end = i;
+            result.push(str.substring(start, end));
+            start = i;
+            curLen = pixelLen;
+          }
+          if (i === str.length - 1) {
+            end = i;
+            result.push(str.substring(start, end + 1));
+          }
+        }
+        return result;
+      }
+    }
 
     // Getter/setter function
     chart.width = function (_) {
@@ -173,11 +231,11 @@
       outerRadius = _;
       return chart;
     };
-    chart.colors = function (_) {
+    chart.color = function (_) {
       if (!arguments.length) {
-        return colors;
+        return color;
       }
-      colors = _;
+      color = _;
       return chart;
     };
     chart.isFilter = function (_) {
@@ -250,7 +308,34 @@
       numberTextSize = _;
       return chart;
     };
-
+    chart.numberPercent = function (_) {
+      if (!arguments.length) {
+        return numberPercent;
+      }
+      numberPercent = _;
+      return chart;
+    };
+    chart.textColor = function (_) {
+      if (!arguments.length) {
+        return textColor;
+      }
+      textColor = _;
+      return chart;
+    };
+    chart.textSize = function (_) {
+      if (!arguments.length) {
+        return textSize;
+      }
+      textSize = _;
+      return chart;
+    };
+    chart.textValue = function (_) {
+      if (!arguments.length) {
+        return textValue;
+      }
+      textValue = _;
+      return chart;
+    };
     return chart;
   }
 }));

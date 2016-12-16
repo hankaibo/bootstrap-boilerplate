@@ -1,5 +1,5 @@
 /**
- *
+ * 帮助工具
  */
 var path = require('path');
 var glob = require('glob');
