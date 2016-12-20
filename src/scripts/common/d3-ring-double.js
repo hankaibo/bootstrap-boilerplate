@@ -59,16 +59,16 @@ module.exports = function () {
   var radiusOut = 300;
   var backgroundColorOut = "#141d1f";
 
+  var lightEffectImg = '';
+  var lightEffectWidth = 0;
+  var lightEffectHeight = 0;
+
   // Private variables
   var centerValue = [];
   var valueOut = [];
   var valueIn = [];
   var linkOut = [];
   var linkIn = [];
-  var arrayX1 = [];
-  var arrayY1 = [];
-  var arrayX2 = [];
-  var arrayY2 = [];
 
   var a;
   var b;
@@ -79,9 +79,6 @@ module.exports = function () {
   var Y;
   var x;
   var y;
-  var xyNodeIn = [];
-  var xyNodeOut = [];
-  var PI2 = 2 * Math.PI;
 
   function chart(selection) {
     selection.each(function () {
@@ -96,13 +93,14 @@ module.exports = function () {
       var ballSizeScaleIn = d3.scaleLinear()
         .domain([0, trackBall])
         .rangeRound([ballSize[1], ballSize[0]]);
+
       var orbitColorScaleOut = d3.scaleLinear()
         .domain([0, trackBallOut])
         .range([orbitColorOut[0], orbitColorOut[1]]);
       var ballSizeScaleOut = d3.scaleLinear()
         .domain([0, trackBallOut])
         .rangeRound([ballSizeOut[1], ballSizeOut[0]]);
-      // 分离出合适的数组
+      // 分离出合适的数据数组
       value.forEach(function (element, index) {
         if (element.mark == 0) {
           centerValue.push(element)
@@ -116,11 +114,13 @@ module.exports = function () {
         valueIn.forEach(function (ele, ind) {
           if (ele.id == element.target) {
             linkIn.push(element);
+            // continue;
           }
         });
         valueOut.forEach(function (ele, ind) {
           if (ele.id == element.target) {
             linkOut.push(element);
+            // continue;
           }
         });
 
@@ -161,242 +161,36 @@ module.exports = function () {
       // 中心区域图
       createRectArea(svg, centerValue, centerTxtOutSize, centerTextOutColor);
       // 内外环轨道
-      createOrbit(svg, radiusIn, orbitColorScaleIn, trackBall, orbitWidth);
-      createOrbit(svg, radiusOut, orbitColorScaleOut, trackBallOut, orbitWidthOut);
+      createOrbit(svg, radiusIn, orbitColorScaleIn, trackBall, orbitWidth, 4000);
+      createOrbit(svg, radiusOut, orbitColorScaleOut, trackBallOut, orbitWidthOut, 8000);
       // 内外环轨道小圆
       if (value) {
-        createCircle(svg, valueIn, trackBall, radiusIn, 'node-in', 'nodeText-in', ballSizeScaleIn, ballTextOutSize, ballTextOutColor);
-        createCircle(svg, valueOut, trackBallOut, radiusOut, 'node-out', 'nodeText-out', ballSizeScaleOut, ballTextOutSizeOut, ballTextOutColorOut);
+        createCircle(svg, valueIn, trackBall, radiusIn, 'node-in', 'nodeText-in', ballSizeScaleIn, ballTextOutSize, ballTextOutColor, 3000);
+        createCircle(svg, valueOut, trackBallOut, radiusOut, 'node-out', 'nodeText-out', ballSizeScaleOut, ballTextOutSizeOut, ballTextOutColorOut, 6000);
       }
       // 内外环轨道之间连接线
-      // createLine('node-in', 'node-out','node-in-line', linkIn, valueIn.length, ballSizeScaleIn);
+      createLine('sun', 'node-in', 'node-in-line', linkIn, 30, 20);
       d3.timeout(function () {
-        // createLineOut();
-        createLine('node-in','node-out', 'node-out-line', linkOut, valueOut.length, ballSizeScaleOut);
+        createLine('node-in', 'node-out', 'node-out-line', linkOut, 20, 20);
       }, 4000);
 
-      // 创建外层线
-      function createLineOut() {
-        svg.selectAll('g.node-out').each(function (d, i) {
-          var xy = d3.select(this).attr('transform').substr(10).replace(')', '').split(',');
-          var id = d3.select(this).attr('id');
-          var fooLine = svg.append("line")
-            .attr("stroke-width", 1.5)
-            .attr("stroke", "#157d8e")
-            .attr('stroke-dasharray', '1000,1000');
-          switch (id) {
-            case 'node-out_1':
-              foobar(i, fooLine, xyNodeIn[0][0], xyNodeIn[0][1], xy[0], xy[1]);
-              break;
-            case 'node-out_2':
-              foobar(i, fooLine, xyNodeIn[1][0], xyNodeIn[1][1], xy[0], xy[1]);
-              break;
-            case 'node-out_3':
-              foobar(i, fooLine, xyNodeIn[1][0], xyNodeIn[1][1], xy[0], xy[1]);
-              break;
-            case 'node-out_4':
-              foobar(i, fooLine, xyNodeIn[1][0], xyNodeIn[1][1], xy[0], xy[1]);
-              break;
-            case 'node-out_5':
-              foobar(i, fooLine, xyNodeIn[1][0], xyNodeIn[1][1], xy[0], xy[1]);
-              break;
-            case 'node-out_6':
-              foobar(i, fooLine, xyNodeIn[1][0], xyNodeIn[1][1], xy[0], xy[1]);
-              break;
-            case 'node-out_7':
-              foobar(i, fooLine, xyNodeIn[1][0], xyNodeIn[1][1], xy[0], xy[1]);
-              break;
-            case 'node-out_8':
-              foobar(i, fooLine, xyNodeIn[3][0], xyNodeIn[3][1], xy[0], xy[1]);
-              break;
-            case 'node-out_9':
-              foobar(i, fooLine, xyNodeIn[3][0], xyNodeIn[3][1], xy[0], xy[1]);
-              break;
-            case 'node-out_10':
-              foobar(i, fooLine, xyNodeIn[5][0], xyNodeIn[5][1], xy[0], xy[1]);
-              break;
-            case 'node-out_11':
-              foobar(i, fooLine, xyNodeIn[5][0], xyNodeIn[5][1], xy[0], xy[1]);
-              break;
-            case 'node-out_12':
-              foobar(i, fooLine, xyNodeIn[5][0], xyNodeIn[5][1], xy[0], xy[1]);
-              break;
-            case 'node-out_13':
-              foobar(i, fooLine, xyNodeIn[5][0], xyNodeIn[5][1], xy[0], xy[1]);
-              break;
-            case 'node-out_14':
-              foobar(i, fooLine, xyNodeIn[5][0], xyNodeIn[5][1], xy[0], xy[1]);
-              break;
-            case 'node-out_15':
-              foobar(i, fooLine, xyNodeIn[5][0], xyNodeIn[5][1], xy[0], xy[1]);
-              break;
-            case 'node-out_16':
-              foobar(i, fooLine, xyNodeIn[5][0], xyNodeIn[5][1], xy[0], xy[1]);
-              break;
-            case 'node-out_17':
-              foobar(i, fooLine, xyNodeIn[5][0], xyNodeIn[5][1], xy[0], xy[1]);
-              break;
-            case 'node-out_18':
-              foobar(i, fooLine, xyNodeIn[7][0], xyNodeIn[7][1], xy[0], xy[1]);
-              break;
-            case 'node-out_19':
-              foobar(i, fooLine, xyNodeIn[8][0], xyNodeIn[8][1], xy[0], xy[1]);
-              break;
-            case 'node-out_20':
-              foobar(i, fooLine, xyNodeIn[8][0], xyNodeIn[8][1], xy[0], xy[1]);
-              break;
-            case 'node-out_21':
-              foobar(i, fooLine, xyNodeIn[8][0], xyNodeIn[8][1], xy[0], xy[1]);
-              break;
-            case 'node-out_22':
-              foobar(i, fooLine, xyNodeIn[8][0], xyNodeIn[8][1], xy[0], xy[1]);
-              break;
-            case 'node-out_23':
-              foobar(i, fooLine, xyNodeIn[8][0], xyNodeIn[8][1], xy[0], xy[1]);
-              break;
-            case 'node-out_24':
-              foobar(i, fooLine, xyNodeIn[9][0], xyNodeIn[9][1], xy[0], xy[1]);
-              break;
-            case 'node-out_25':
-              foobar(i, fooLine, xyNodeIn[10][0], xyNodeIn[10][1], xy[0], xy[1]);
-              break;
-            case 'node-out_26':
-              foobar(i, fooLine, xyNodeIn[10][0], xyNodeIn[10][1], xy[0], xy[1]);
-              break;
-            case 'node-out_27':
-              foobar(i, fooLine, xyNodeIn[11][0], xyNodeIn[11][1], xy[0], xy[1]);
-              break;
-            case 'node-out_28':
-              foobar(i, fooLine, xyNodeIn[12][0], xyNodeIn[12][1], xy[0], xy[1]);
-              break;
-            case 'node-out_29':
-              foobar(i, fooLine, xyNodeIn[12][0], xyNodeIn[12][1], xy[0], xy[1]);
-              break;
-            case 'node-out_30':
-              foobar(i, fooLine, xyNodeIn[12][0], xyNodeIn[12][1], xy[0], xy[1]);
-              break;
-            case 'node-out_31':
-              foobar(i, fooLine, xyNodeIn[12][0], xyNodeIn[12][1], xy[0], xy[1]);
-              break;
-            case 'node-out_32':
-              foobar(i, fooLine, xyNodeIn[12][0], xyNodeIn[12][1], xy[0], xy[1]);
-              break;
-            case 'node-out_33':
-              foobar(i, fooLine, xyNodeIn[12][0], xyNodeIn[12][1], xy[0], xy[1]);
-              break;
-            case 'node-out_34':
-              foobar(i, fooLine, xyNodeIn[13][0], xyNodeIn[13][1], xy[0], xy[1]);
-              break;
-            case 'node-out_35':
-              foobar(i, fooLine, xyNodeIn[13][0], xyNodeIn[13][1], xy[0], xy[1]);
-              break;
-            case 'node-out_36':
-              foobar(i, fooLine, xyNodeIn[13][0], xyNodeIn[13][1], xy[0], xy[1]);
-              break;
-            case 'node-out_37':
-              foobar(i, fooLine, xyNodeIn[15][0], xyNodeIn[15][1], xy[0], xy[1]);
-              break;
-            case 'node-out_38':
-              foobar(i, fooLine, xyNodeIn[15][0], xyNodeIn[15][1], xy[0], xy[1]);
-              break;
-            case 'node-out_39':
-              foobar(i, fooLine, xyNodeIn[15][0], xyNodeIn[15][1], xy[0], xy[1]);
-              break;
-            case 'node-out_40':
-              foobar(i, fooLine, xyNodeIn[17][0], xyNodeIn[17][1], xy[0], xy[1]);
-              break;
-            case 'node-out_41':
-              foobar(i, fooLine, xyNodeIn[17][0], xyNodeIn[17][1], xy[0], xy[1]);
-              break;
-            case 'node-out_42':
-              foobar(i, fooLine, xyNodeIn[17][0], xyNodeIn[17][1], xy[0], xy[1]);
-              break;
-            case 'node-out_43':
-              foobar(i, fooLine, xyNodeIn[17][0], xyNodeIn[17][1], xy[0], xy[1]);
-              break;
-            case 'node-out_44':
-              foobar(i, fooLine, xyNodeIn[17][0], xyNodeIn[17][1], xy[0], xy[1]);
-              break;
-            case 'node-out_45':
-              foobar(i, fooLine, xyNodeIn[19][0], xyNodeIn[19][1], xy[0], xy[1]);
-              break;
-            case 'node-out_46':
-              foobar(i, fooLine, xyNodeIn[19][0], xyNodeIn[19][1], xy[0], xy[1]);
-              break;
-            case 'node-out_47':
-
-              break;
-            case 'node-out_48':
-
-              break;
-            case 'node-out_49':
-
-              break;
-            case 'node-out_51':
-
-              break;
-            default:
-              break;
-          }
-
-        });
-        function foobar(i, dom, x1, y1, x2, y2) {
-          var hypotenuse = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
-          var offx1 = (x2 - x1) / hypotenuse * 20;
-          var offy1 = (y2 - y1) / hypotenuse * 20;
-          // console.log('______'+offx1);
-          // console.log('______'+offy1);
-          var x1out = parseFloat(x1) + offx1;
-          var y1out = parseFloat(y1) + offy1;
-          var x2out = parseFloat(x2) - offx1;
-          var y2out = parseFloat(y2) - offy1;
-
-          var hudu = Math.atan2((y2 - y1), (x2 - x1));
-          var jiaodu = hudu * 180 / Math.PI;
-          // console.log(jiaodu);
-
-          dom
-            .attr('x1', x1out)
-            .attr('y1', y1out)
-            .attr('x2', x2out)
-            .attr('y2', y2out)
-            .attr("marker-end", "url(#arrow)")
-            .transition()
-            .duration(2000)
-            .styleTween("stroke-dashoffset", function () {
-              return d3.interpolateNumber(1000, 0);
-            });
-          // console.log(x1out);
-          // console.log(y1out);
-          // console.log(x2out);
-          // console.log(y2out);
-
-          var svg_mark = svg
-            .append('g')
-            .attr('transform', 'rotate(' + (jiaodu + 180) + ')');
-          svg_mark
-            .append('image')
-            .attr('xlink:href', '../../img/50_12.png')
-            .attr('transform', 'translate(' + (-50 / 2) + ',' + (-12 / 2) + ')');
-          var mpath = svg_mark.append("animateMotion").attr("path", function (d) {
-            return "M" + x1out + "," + y1out + "L" + x2out + "," + y2out;
-          })
-            .attr("dur", "4s")
-            .attr("begin", "0s")
-            .attr("repeatCount", "indefinite")
-          // .ease('quad-in');
-        }
-      }
-      // 创建连接线
-      function createLine(source,target, lineCss, value, circleNum, circleRadius) {
+      /**
+       * 创建连接线
+       *
+       * @param {any} source 连接线起点
+       * @param {any} target 连接线终点
+       * @param {any} lineCss 连接线css
+       * @param {any} value 可视化的数据
+       * @param {any} sourceRadius 起点圆半径
+       * @param {any} targetRadius 终点圆半径
+       */
+      function createLine(source, target, lineCss, value, sourceRadius, targetRadius) {
         var linkEnter = svg.selectAll('g.' + lineCss)
           .data(value)
           .enter()
           .append('g')
           .attr('class', lineCss)
-          .attr('id', function (d, i) {
-            return lineCss + '_' + (i + 1);
-          });
+          .attr('id', function (d, i) { return lineCss + '_' + (i + 1); });
         var linkExit = svg.selectAll('g.' + lineCss)
           .data(value)
           .exit()
@@ -404,102 +198,60 @@ module.exports = function () {
         var linkData = svg.selectAll('g.' + lineCss)
           .data(value);
 
-        linkData.append("line")
-          .attr("stroke-width", 1.5)
-          .attr("stroke", "#157d8e")
-          .attr('stroke-dasharray', '1000,1000')
-          .attr('x1', function (d, i) {
-            var xy = document.querySelector('#' + source + '_' + d.source).getAttribute('transform').substr(10).replace(')', '').split(',');
-            var hudu1 = (i + 0) * (2 * Math.PI / circleNum);
-            var X1 = Math.sin(hudu1) * circleRadius(i);
-            arrayX1.push(X1);
-            xyNodeIn.push(xy);
-            return X1;
-          })
-          .attr('y1', function (d, i) {
-            var xy = document.querySelector('#' + source + '_' + d.source).getAttribute('transform').substr(10).replace(')', '').split(',');
-            var hudu1 = (i + 0) * (2 * Math.PI / circleNum);
-            var Y1 = -Math.cos(hudu1) * circleRadius(i);
-            arrayY1.push(Y1);
-            return Y1;
-          })
-          .attr('x2', function (d, i) {
-            var xy = document.querySelector('#' + target + '_' + d.target).getAttribute('transform').substr(10).replace(')', '').split(',');
-            var hudu1 = (i + 0) * (2 * Math.PI / circleNum);
-            var X2 = Math.sin(2 * Math.PI - hudu1) * 20 + parseFloat(xy[0]);
-            arrayX2.push(X2);
-            return X2;
-          })
-          .attr('y2', function (d, i) {
-            var xy = document.querySelector('#' + target + '_' + d.target).getAttribute('transform').substr(10).replace(')', '').split(',');
-            var hudu1 = (i + 0) * (2 * Math.PI / circleNum);
-            var Y2 = Math.cos(2 * Math.PI - hudu1) * 20 + parseFloat(xy[1]);
-            arrayY2.push(Y2);
-            return Y2;
-          })
-          .attr("marker-end", "url(#arrow)")
-          .transition()
-          .duration(2000)
-          .styleTween("stroke-dashoffset", function () {
-            return d3.interpolateNumber(1000, 0);
-          });
         linkData.each(function (d, i) {
+          var linkLine = d3.select(this).append("line")
+            .attr("stroke-width", 1.5)
+            .attr("stroke", "#157d8e");
+          var x1y1 = document.querySelector('#' + source + '_' + d.source).getAttribute('transform').substr(10).replace(')', '').split(',');
+          var x2y2 = document.querySelector('#' + target + '_' + d.target).getAttribute('transform').substr(10).replace(')', '').split(',');
+          var x1 = parseFloat(x1y1[0]);
+          var y1 = parseFloat(x1y1[1]);
+          var x2 = parseFloat(x2y2[0]);
+          var y2 = parseFloat(x2y2[1]);
+          var hypotenuse = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+          var offx1 = (x2 - x1) / hypotenuse * sourceRadius;
+          var offy1 = (y2 - y1) / hypotenuse * sourceRadius;
+          var offx2 = (x2 - x1) / hypotenuse * targetRadius;
+          var offy2 = (y2 - y1) / hypotenuse * targetRadius;
+          var x1out = parseFloat(x1) + offx1;
+          var y1out = parseFloat(y1) + offy1;
+          var x2out = parseFloat(x2) - offx2;
+          var y2out = parseFloat(y2) - offy2;
+
+          var hudu = Math.atan2((y2 - y1), (x2 - x1));
+          var jiaodu = hudu * 180 / Math.PI;
+
+          linkLine
+            .attr('x1', x1out)
+            .attr('y1', y1out)
+            .attr('x2', x1out)
+            .attr('y2', y1out)
+            .attr("marker-end", "url(#arrow)")
+            .transition()
+            .ease(d3.easePoly.exponent(2))
+            .duration(3000)
+            .attr('x1', x1out)
+            .attr('y1', y1out)
+            .attr('x2', x2out)
+            .attr('y2', y2out);
+
           var svg_mark = svg
             .append('g')
-            .attr('transform', 'rotate(' + (360) + ')');
+            .attr('transform', 'rotate(' + (jiaodu + 180) + ')');
           svg_mark
             .append('image')
-            .attr('xlink:href', '../../img/50_12.png')
-            .attr('transform', 'translate(' + (-50 / 2) + ',' + (-12 / 2) + ')');
-          var mpath = svg_mark.append("animateMotion").attr("path", function (d) {
-            console.log(arrayX1[i] + ',' + arrayY1[i]);
-            console.log(arrayX2[i] + ',' + arrayY2[i]);
-            console.log('---------------------------');
-            return "M" + arrayX1[i] + "," + arrayY1[i] + "L" + arrayX2[i] + "," + arrayX2[i];
-          }).attr("dur", "4s").attr("begin", "1s").attr("repeatCount", "indefinite");
+            .attr('xlink:href', lightEffectImg)
+            .attr('transform', 'translate(' + (-lightEffectWidth / 2) + ',' + (-lightEffectHeight / 2) + ')');
+          svg_mark.append("animateMotion")
+            .attr("path", function (d) {
+              return "M" + x1out + "," + y1out + "L" + x2out + "," + y2out;
+            })
+            .attr("dur", "4s")
+            .attr("begin", "0s")
+            .attr("repeatCount", "indefinite");
+
         })
 
-
-        // svg.selectAll('g.' + nodeCss).each(function (d, i) {
-        // var xy = d3.select(this).attr('transform').substr(10).replace(')', '').split(',');
-        // xyNodeIn.push(xy);
-
-        // var hudu1 = (i + 0) * (2 * Math.PI / circleNum);
-        // var X1 = Math.sin(hudu1) * circleRadius(i);
-        // var Y1 = -Math.cos(hudu1) * circleRadius(i);
-        // // console.log(X1+'___'+Y1);
-
-        // var X2 = Math.sin(2 * Math.PI - hudu1) * 20 + parseFloat(xy[0]);
-        // var Y2 = Math.cos(2 * Math.PI - hudu1) * 20 + parseFloat(xy[1]);
-        // console.log(X2+'___'+Y2);
-
-        // svg.append("line")
-        //   .attr("stroke-width", 1.5)
-        //   .attr("stroke", "#157d8e")
-        //   .attr('stroke-dasharray', '1000,1000')
-        //   .attr('x1', X1)
-        //   .attr('y1', Y1)
-        //   .attr('x2', X2)
-        //   .attr('y2', Y2)
-        //   .attr("marker-end", "url(#arrow)")
-        //   .transition()
-        //   .duration(2000)
-        //   .styleTween("stroke-dashoffset", function () {
-        //     return d3.interpolateNumber(1000, 0);
-        //   });
-
-        // var svg_mark = svg
-        //   .append('g')
-        //   .attr('transform', 'rotate(' + (18 * i + 90) + ')');
-        // svg_mark
-        //   .append('image')
-        //   .attr('xlink:href', '../../img/50_12.png')
-        //   .attr('transform', 'translate(' + (-50 / 2) + ',' + (-12 / 2) + ')');
-        // var mpath = svg_mark.append("animateMotion").attr("path", function (d) {
-        //   return "M" + X1 + "," + Y1 + "L" + (X2) + "," + (Y2);
-        // }).attr("dur", "4s").attr("begin", "1s").attr("repeatCount", "indefinite");
-
-        // });
       }
       /**
        * 创建圆
@@ -514,16 +266,22 @@ module.exports = function () {
        * @param {any} fontSize 文字大小
        * @param {any} fontColor 文字颜色
        */
-      function createCircle(dom, value, ballSum, radius, nodeClass, nodeTextClass, ballSizeScale, fontSize, fontColor) {
-        // var foo=d3.forceSimulation(value);
+      function createCircle(dom, value, ballSum, radius, nodeClass, nodeTextClass, ballSizeScale, fontSize, fontColor, delay) {
+        var halfBallSum = (value.length) / 2;
         var nodeEnter = dom.selectAll('g.' + nodeClass)
           .data(value)
           .enter()
           .append('g')
           .attr('class', nodeClass)
+          .attr('opacity', '0')
           .attr('id', function (d, i) {
             return nodeClass + '_' + d.id;
-          });
+          })
+          .transition()
+          .ease(d3.easePoly.exponent(2))
+          .duration(4000)
+          .delay(delay)
+          .attr('opacity', '1');
 
         var nodeExit = dom.selectAll('g.' + nodeClass)
           .data(value)
@@ -562,14 +320,19 @@ module.exports = function () {
 
           X = Math.sin(isClockwise ? hudu : (2 * Math.PI - hudu)) * (radius);
           Y = Math.cos(isClockwise ? hudu : (2 * Math.PI - hudu)) * (radius);
-          d3.select(this)
-            .attr('transform', 'translate(' + X + ',' + -Y + ')');
+          d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
 
-          x = Math.sin(isClockwise ? (2 * Math.PI - hudu) : hudu) * ballSizeScale(i);
-          y = Math.cos(isClockwise ? (2 * Math.PI - hudu) : hudu) * ballSizeScale(i);
+          x = Math.sin(isClockwise ? (2 * Math.PI - hudu) : hudu) * ballSizeScale(i) / 2;
+          y = Math.cos(isClockwise ? (2 * Math.PI - hudu) : hudu) * ballSizeScale(i) / 2;
           var nodeTextOut = d3.select(this)
-            .select('text.' + nodeTextClass)
-            .attr('transform', 'translate(' + -x + ',' + -y + ')');
+            .select('text.' + nodeTextClass);
+          if (i <= 3) {
+            nodeTextOut.attr('transform', 'translate(' + -x + ',' + -(y + (3 - i) * 10) + ')');
+          } else if (i > (halfBallSum - 2) && i <= (halfBallSum + 2)) {
+            nodeTextOut.attr('transform', 'translate(' + -x + ',' + -(y + (halfBallSum - i) * 10) + ')');
+          } else {
+            nodeTextOut.attr('transform', 'translate(' + -x + ',' + -y + ')');
+          }
           setTextOfcircle(nodeTextOut, isClockwise ? hudu : (2 * Math.PI - hudu));
 
         });
@@ -592,13 +355,13 @@ module.exports = function () {
           }
           // 对特殊角度进行单独设置
           if (hudu == 0 || hudu == 2 * Math.PI) {
-            execTextOfcircleLayout(dom, 'text-before-edge', 'middle');
+            execTextOfcircleLayout(dom, 'text-before-edge', 'start');
           } else if (hudu == Math.PI * .5) {
-            execTextOfcircleLayout(dom, 'central', 'end');
+            execTextOfcircleLayout(dom, 'text-before-edge', 'start');
           } else if (hudu == Math.PI * 1) {
             execTextOfcircleLayout(dom, 'text-after-edge', 'middle');
           } else if (hudu == Math.PI * 1.5) {
-            execTextOfcircleLayout(dom, 'central', 'start');
+            execTextOfcircleLayout(dom, 'text-after-edge', 'end');
           }
         }
         /**
@@ -622,14 +385,19 @@ module.exports = function () {
        * @param {any} orbitNum 轨道等分
        * @param {any} orbitWidth 轨道宽度
        */
-      function createOrbit(dom, radius, orbitCS, orbitNum, orbitWidth) {
+      function createOrbit(dom, radius, orbitCS, orbitNum, orbitWidth, delay) {
         for (var i = 0; i < 1; i++) {
           // for (var i = 0; i < orbitNum; i++) {
           dom.append("path")
             .attr("class", "earthOrbitPosition")
             .attr("d", d3.arc().outerRadius(radius + orbitWidth / 2).innerRadius(radius - orbitWidth / 2).startAngle(0).endAngle(2 * Math.PI))
             // .attr("d", d3.arc().outerRadius(radius + orbitWidth / 2).innerRadius(radius - orbitWidth / 2).startAngle(2 * Math.PI * i / orbitNum).endAngle(2 * Math.PI * (i + 1) / orbitNum))
-            .style("fill", orbitCS(i));
+            .style("fill", orbitCS(i))
+            .attr('opacity', '0')
+            .transition()
+            .duration(4000)
+            .delay(delay)
+            .attr('opacity', '1');
         }
       }
       /**
@@ -646,7 +414,7 @@ module.exports = function () {
           .enter()
           .append('g')
           .attr('class', 'sun')
-          .attr('id', function (d, i) { return 'node-in_' + i; })
+          .attr('id', function (d, i) { return 'sun_' + i; })
           .attr('transform', 'translate(0,0)');
 
         var nodeExit = dom.select('g.sun')
@@ -722,6 +490,7 @@ module.exports = function () {
           .attr('d', arrow_path)
           .attr('fill', '#157d8e');
       }
+
     });
   }
 
@@ -773,6 +542,34 @@ module.exports = function () {
       return centerImgHeight;
     }
     centerImgHeight = _;
+    return chart;
+  };
+  chart.centerTxtOutSize = function (_) {
+    if (!arguments.length) {
+      return centerTxtOutSize;
+    }
+    centerTxtOutSize = _;
+    return chart;
+  };
+  chart.centerTextOutColor = function (_) {
+    if (!arguments.length) {
+      return centerTextOutColor;
+    }
+    centerTextOutColor = _;
+    return chart;
+  };
+  chart.centerTextDominantBaseline = function (_) {
+    if (!arguments.length) {
+      return centerTextDominantBaseline;
+    }
+    centerTextDominantBaseline = _;
+    return chart;
+  };
+  chart.centerTextAnchor = function (_) {
+    if (!arguments.length) {
+      return centerTextAnchor;
+    }
+    centerTextAnchor = _;
     return chart;
   };
   chart.imgWidth = function (_) {
@@ -1039,6 +836,27 @@ module.exports = function () {
       return backgroundColorOut;
     }
     backgroundColorOut = _;
+    return chart;
+  };
+  chart.lightEffectImg = function (_) {
+    if (!arguments.length) {
+      return lightEffectImg;
+    }
+    lightEffectImg = _;
+    return chart;
+  };
+  chart.lightEffectWidth = function (_) {
+    if (!arguments.length) {
+      return lightEffectWidth;
+    }
+    lightEffectWidth = _;
+    return chart;
+  };
+  chart.lightEffectHeight = function (_) {
+    if (!arguments.length) {
+      return lightEffectHeight;
+    }
+    lightEffectHeight = _;
     return chart;
   };
 

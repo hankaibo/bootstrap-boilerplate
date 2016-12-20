@@ -162,33 +162,37 @@ var links = [
 var circle1 = ringDouble()
   .width(1280)
   .height(930)
-  .backgroundColor('#151617')  //背景色
+  .backgroundColor('#DFDFDF')  //背景色
   .value(value) // 小球数据，默认无
   .link(links) // 小球之间连接线，默认无
 
-  .backgroundColorIn('#132528')
+  .backgroundColorIn('#B1C2C4')
   .orbitColor(['#5185dd', '#4199ca']) // 小球外切轨道的颜色，默认['#5185dd', '#4199ca']
   .orbitWidth(1) // 小球外切轨道的宽度，默认1
   .trackBall(20) // 小球外切轨道显示多少个小球，默认12
   .ballSize([60, 60]) // 小球的半径从小到大，默认[12,24]
   .ballTextOutSize(12) // 小球外文字大小，默认12
-  .ballTextOutColor('#fff') // 小球外文字颜色
+  .ballTextOutColor('#000') // 小球外文字颜色
   .firstQuadrantTextAnchor('start')
   .secondQuadrantTextAnchor('start')
   .thirdQuadrantTextAnchor('end')
   .fourthQuadrantTextAnchor('end')
 
-  .backgroundColorOut('#141d1f')
+  .backgroundColorOut('#C7CFD0')
   .orbitColorOut(['#5185dd', '#4199ca']) //
   .orbitWidthOut(1) //
-  .trackBallOut(46) //
-  .ballSizeOut([100, 100]) //
+  .trackBallOut(50) //
+  .ballSizeOut([60, 60]) //
   .ballTextOutSizeOut(12) //
-  .ballTextOutColorOut('#fff')
+  .ballTextOutColorOut('#000')
   .firstQuadrantTextAnchorOut('start')
   .secondQuadrantTextAnchorOut('start')
   .thirdQuadrantTextAnchorOut('end')
-  .fourthQuadrantTextAnchorOut('end');
+  .fourthQuadrantTextAnchorOut('end')
+
+  .lightEffectImg('../../img/50_12.png')
+  .lightEffectWidth(50)
+  .lightEffectHeight(12);
 
 
 d3.select('.d3-circle').call(circle1);
