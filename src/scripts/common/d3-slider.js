@@ -1,4 +1,5 @@
 /**
+ * This is a pure D3.js
  * 本模块来源于https://github.com/MasterMaps/d3-slider.git，对其进行v4改造。
  */
 (function (root, factory) {

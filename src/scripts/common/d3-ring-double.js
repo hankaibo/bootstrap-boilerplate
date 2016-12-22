@@ -63,6 +63,8 @@ module.exports = function () {
   var lightEffectWidth = 0;
   var lightEffectHeight = 0;
 
+  var animateTime=1000;
+
   // Private variables
   var centerValue = [];
   var valueOut = [];
@@ -151,32 +153,40 @@ module.exports = function () {
         svg.selectAll('.backgroundColorArc').sort(function (a, b) {
           return 1;
         });
-      }, 4000);
+      }, animateTime);
       d3.timeout(function () {
         createBackground(svg, radiusOut, maxRadius, backgroundColor, 3);
         svg.selectAll('.backgroundColorArc').sort(function (a, b) {
           return 1;
         });
-      }, 8000);
+      }, 2*animateTime);
       // 中心区域图
-      createRectArea(svg, centerValue, centerTxtOutSize, centerTextOutColor);
+      createRectArea(svg, 'sort-group', centerValue, centerTxtOutSize, centerTextOutColor);
       // 内外环轨道
-      createOrbit(svg, radiusIn, orbitColorScaleIn, trackBall, orbitWidth, 4000);
-      createOrbit(svg, radiusOut, orbitColorScaleOut, trackBallOut, orbitWidthOut, 8000);
+      createOrbit(svg, radiusIn, orbitColorScaleIn, trackBall, orbitWidth, animateTime);
+      createOrbit(svg, radiusOut, orbitColorScaleOut, trackBallOut, orbitWidthOut, 2*animateTime);
       // 内外环轨道小圆
       if (value) {
-        createCircle(svg, valueIn, trackBall, radiusIn, 'node-in', 'nodeText-in', ballSizeScaleIn, ballTextOutSize, ballTextOutColor, 3000);
-        createCircle(svg, valueOut, trackBallOut, radiusOut, 'node-out', 'nodeText-out', ballSizeScaleOut, ballTextOutSizeOut, ballTextOutColorOut, 6000);
+        createCircle(svg, 'sort-group', valueIn, trackBall, radiusIn, 'node-in', 'nodeText-in', ballSizeScaleIn, ballTextOutSize, ballTextOutColor, animateTime);
+        createCircle(svg, 'sort-group', valueOut, trackBallOut, radiusOut, 'node-out', 'nodeText-out', ballSizeScaleOut, ballTextOutSizeOut, ballTextOutColorOut, 2*animateTime);
       }
       // 内外环轨道之间连接线
-      createLine('sun', 'node-in', 'node-in-line', linkIn, 30, 20);
+      createLine(svg, 'sort-group', 'sun', 'node-in', 'node-in-line', linkIn, 30, 20);
+      svg.selectAll('.sort-group').sort(function (a, b) {
+        return 1;
+      });
       d3.timeout(function () {
-        createLine('node-in', 'node-out', 'node-out-line', linkOut, 20, 20);
-      }, 4000);
+        createLine(svg, 'sort-group', 'node-in', 'node-out', 'node-out-line', linkOut, 20, 20);
+        svg.selectAll('.sort-group').sort(function (a, b) {
+          return 1;
+        });
+      }, animateTime);
 
       /**
        * 创建连接线
        *
+       * @param {any} dom 操作区域
+       * @param {any} domcss 操作区域样式
        * @param {any} source 连接线起点
        * @param {any} target 连接线终点
        * @param {any} lineCss 连接线css
@@ -184,24 +194,26 @@ module.exports = function () {
        * @param {any} sourceRadius 起点圆半径
        * @param {any} targetRadius 终点圆半径
        */
-      function createLine(source, target, lineCss, value, sourceRadius, targetRadius) {
-        var linkEnter = svg.selectAll('g.' + lineCss)
+      function createLine(dom, domcss, source, target, lineCss, value, sourceRadius, targetRadius) {
+        var domg = dom.append('g')
+          .attr('class', domcss);
+        domg.selectAll('g.' + lineCss)
           .data(value)
           .enter()
           .append('g')
           .attr('class', lineCss)
           .attr('id', function (d, i) { return lineCss + '_' + (i + 1); });
-        var linkExit = svg.selectAll('g.' + lineCss)
+        domg.selectAll('g.' + lineCss)
           .data(value)
           .exit()
           .remove();
-        var linkData = svg.selectAll('g.' + lineCss)
+        var linkData = domg.selectAll('g.' + lineCss)
           .data(value);
 
         linkData.each(function (d, i) {
           var linkLine = d3.select(this).append("line")
             .attr("stroke-width", 1.5)
-            .attr("stroke", "#157d8e");
+            .attr("stroke", d3.hsl(188, .85, .56, .3));
           var x1y1 = document.querySelector('#' + source + '_' + d.source).getAttribute('transform').substr(10).replace(')', '').split(',');
           var x2y2 = document.querySelector('#' + target + '_' + d.target).getAttribute('transform').substr(10).replace(')', '').split(',');
           var x1 = parseFloat(x1y1[0]);
@@ -229,13 +241,13 @@ module.exports = function () {
             .attr("marker-end", "url(#arrow)")
             .transition()
             .ease(d3.easePoly.exponent(2))
-            .duration(3000)
+            .duration(animateTime)
             .attr('x1', x1out)
             .attr('y1', y1out)
             .attr('x2', x2out)
             .attr('y2', y2out);
 
-          var svg_mark = svg
+          var svg_mark = domg
             .append('g')
             .attr('transform', 'rotate(' + (jiaodu + 180) + ')');
           svg_mark
@@ -246,17 +258,23 @@ module.exports = function () {
             .attr("path", function (d) {
               return "M" + x1out + "," + y1out + "L" + x2out + "," + y2out;
             })
-            .attr("dur", "4s")
+            .attr("dur", "2s")
             .attr("begin", "0s")
             .attr("repeatCount", "indefinite");
-
-        })
+          svg_mark.append('animate')
+            .attr('attributeName', 'opacity')
+            .attr('values', '0;1;0')
+            .attr("dur", "2s")
+            .attr("begin", "0s")
+            .attr("repeatCount", "indefinite");
+        });
 
       }
       /**
        * 创建圆
        *
        * @param {any} dom 操作区域
+       * @param {any} domcss 操作区域样式
        * @param {any} value 可视化的数据
        * @param {any} ballSum 小圆数
        * @param {any} radius 小圆半径
@@ -266,9 +284,11 @@ module.exports = function () {
        * @param {any} fontSize 文字大小
        * @param {any} fontColor 文字颜色
        */
-      function createCircle(dom, value, ballSum, radius, nodeClass, nodeTextClass, ballSizeScale, fontSize, fontColor, delay) {
+      function createCircle(dom, domcss, value, ballSum, radius, nodeClass, nodeTextClass, ballSizeScale, fontSize, fontColor, delay) {
         var halfBallSum = (value.length) / 2;
-        var nodeEnter = dom.selectAll('g.' + nodeClass)
+        var domg = dom.append('g')
+          .attr('class', domcss);
+        domg.selectAll('g.' + nodeClass)
           .data(value)
           .enter()
           .append('g')
@@ -279,16 +299,16 @@ module.exports = function () {
           })
           .transition()
           .ease(d3.easePoly.exponent(2))
-          .duration(4000)
+          .duration(animateTime)
           .delay(delay)
           .attr('opacity', '1');
 
-        var nodeExit = dom.selectAll('g.' + nodeClass)
+        domg.selectAll('g.' + nodeClass)
           .data(value)
           .exit()
           .remove();
 
-        var nodeData = dom.selectAll('g.' + nodeClass)
+        var nodeData = domg.selectAll('g.' + nodeClass)
           .data(value);
 
         nodeData.append("image")
@@ -302,7 +322,12 @@ module.exports = function () {
           .attr('y', 0)
           .style('fill', fontColor)
           .style('font-size', function (d, i) { return fontSize; })
-          .text(function (d) { return d.name; });
+          .text(function (d) {
+            // return d.name;
+          });
+        // nodeData.data().forEach(function(element,index){
+        // appendMultiText(nodeData, nodeTextClass, 'element.name1111111', 0, 0, radiusOut - radiusIn - 50, fontSize, fontColor, "simsun");
+        // });
         nodeData.each(function (d, i) {
           if (isEquant) {
             hudu = (i + 0) * (2 * Math.PI / ballSum);
@@ -395,7 +420,7 @@ module.exports = function () {
             .style("fill", orbitCS(i))
             .attr('opacity', '0')
             .transition()
-            .duration(4000)
+            .duration(animateTime)
             .delay(delay)
             .attr('opacity', '1');
         }
@@ -404,20 +429,21 @@ module.exports = function () {
        * 创建中心区域图
        *
        * @param {any} dom 操作区域
+       * @param {any} domcss 操作区域样式
        * @param {any} value 可视化的数据
        * @param {any} fontSize 字体大小
        * @param {any} fontColor 字体颜色
        */
-      function createRectArea(dom, value, fontSize, fontColor) {
-        var nodeEnter = dom.selectAll('g.sun')
+      function createRectArea(dom, domcss, value, fontSize, fontColor) {
+        dom.selectAll('g.sun')
           .data(value)
           .enter()
           .append('g')
-          .attr('class', 'sun')
+          .attr('class', 'sun ' + domcss)
           .attr('id', function (d, i) { return 'sun_' + i; })
           .attr('transform', 'translate(0,0)');
 
-        var nodeExit = dom.select('g.sun')
+        dom.select('g.sun')
           .data(value)
           .exit()
           .remove();
@@ -460,7 +486,7 @@ module.exports = function () {
             endAngle: 2 * Math.PI
           }))
           .transition()
-          .duration(4000)
+          .duration(animateTime)
           .attr('d', d3.arc()({
             innerRadius: innerRadius,
             outerRadius: outerRadius,
@@ -488,7 +514,67 @@ module.exports = function () {
         var arrow_path = "M2,2 L10,6 L2,10 L6,6 L2,2";
         arrowMarker.append('path')
           .attr('d', arrow_path)
-          .attr('fill', '#157d8e');
+          .attr('fill', d3.hsl(188, .85, .56, .3));
+      }
+      /**
+       * 文本自动换行
+       *
+       * @param {any} dom 文本的容器
+       * @param {any} domcss 文本的容器的样式名称
+       * @param {any} str 字符串
+       * @param {any} posX 文本的x坐标
+       * @param {any} posY 文本的y坐标
+       * @param {any} width 每一行的宽度，单位为像素
+       * @param {any} fontsize 文字的大小
+       * @param {any} fontcolor 文字的颜色
+       * @param {any} fontfamily 文字的字体
+       * @returns
+       */
+      function appendMultiText(dom, domcss, str, posX, posY, width, fontsize, fontcolor, fontfamily) {
+        var strs = splitByLine(str, width, fontsize);
+
+        var mulText = dom.append("text")
+          .attr('class', domcss)
+          .attr("x", posX)
+          .attr("y", posY)
+          .style('fill', fontcolor)
+          .style("font-size", fontsize)
+          .style("font-family", fontfamily);
+
+        mulText.selectAll("tspan")
+          .data(strs)
+          .enter()
+          .append("tspan")
+          .attr("x", mulText.attr("x"))
+          .attr("dy", "1em")
+          .text(function (d) {
+            return d;
+          });
+
+        return mulText;
+
+        function splitByLine(str, max, fontsize) {
+          var curLen = 0;
+          var result = [];
+          var start = 0, end = 0;
+          for (var i = 0; i < str.length; i++) {
+            var code = str.charCodeAt(i);
+            var pixelLen = code > 255 ? fontsize : fontsize / 2;
+            curLen += pixelLen;
+            if (curLen > max) {
+              end = i;
+              result.push(str.substring(start, end));
+              start = i;
+              curLen = pixelLen;
+            }
+            if (i === str.length - 1) {
+              end = i;
+              result.push(str.substring(start, end + 1));
+            }
+          }
+          return result;
+        }
+
       }
 
     });
@@ -861,6 +947,5 @@ module.exports = function () {
   };
 
   return chart;
-
 
 };
