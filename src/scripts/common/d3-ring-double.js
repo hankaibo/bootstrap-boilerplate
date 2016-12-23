@@ -63,7 +63,7 @@ module.exports = function () {
   var lightEffectWidth = 0;
   var lightEffectHeight = 0;
 
-  var animateTime=1000;
+  var animateTime = 1000;
 
   // Private variables
   var centerValue = [];
@@ -84,6 +84,9 @@ module.exports = function () {
 
   function chart(selection) {
     selection.each(function () {
+      var tooltip = selection.append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0.0);
       // 计算页面的宽度和高度
       var scrollWidth = document.body.scrollWidth;
       var scrollHeight = document.body.scrollHeight;
@@ -111,21 +114,6 @@ module.exports = function () {
         } else if (element.mark == 2) {
           valueOut.push(element)
         }
-      });
-      link.forEach(function (element, index) {
-        valueIn.forEach(function (ele, ind) {
-          if (ele.id == element.target) {
-            linkIn.push(element);
-            // continue;
-          }
-        });
-        valueOut.forEach(function (ele, ind) {
-          if (ele.id == element.target) {
-            linkOut.push(element);
-            // continue;
-          }
-        });
-
       });
 
       // svg区域
@@ -159,24 +147,24 @@ module.exports = function () {
         svg.selectAll('.backgroundColorArc').sort(function (a, b) {
           return 1;
         });
-      }, 2*animateTime);
+      }, 2 * animateTime);
       // 中心区域图
       createRectArea(svg, 'sort-group', centerValue, centerTxtOutSize, centerTextOutColor);
       // 内外环轨道
       createOrbit(svg, radiusIn, orbitColorScaleIn, trackBall, orbitWidth, animateTime);
-      createOrbit(svg, radiusOut, orbitColorScaleOut, trackBallOut, orbitWidthOut, 2*animateTime);
+      createOrbit(svg, radiusOut, orbitColorScaleOut, trackBallOut, orbitWidthOut, 2 * animateTime);
       // 内外环轨道小圆
       if (value) {
         createCircle(svg, 'sort-group', valueIn, trackBall, radiusIn, 'node-in', 'nodeText-in', ballSizeScaleIn, ballTextOutSize, ballTextOutColor, animateTime);
-        createCircle(svg, 'sort-group', valueOut, trackBallOut, radiusOut, 'node-out', 'nodeText-out', ballSizeScaleOut, ballTextOutSizeOut, ballTextOutColorOut, 2*animateTime);
+        createCircle(svg, 'sort-group', valueOut, trackBallOut, radiusOut, 'node-out', 'nodeText-out', ballSizeScaleOut, ballTextOutSizeOut, ballTextOutColorOut, 2 * animateTime);
       }
       // 内外环轨道之间连接线
-      createLine(svg, 'sort-group', 'sun', 'node-in', 'node-in-line', linkIn, 30, 20);
+      createLine(svg, 'sort-group', 'sun', 'node-in', 'node-in-line', link, 30, 20);
       svg.selectAll('.sort-group').sort(function (a, b) {
         return 1;
       });
       d3.timeout(function () {
-        createLine(svg, 'sort-group', 'node-in', 'node-out', 'node-out-line', linkOut, 20, 20);
+        createLine(svg, 'sort-group', 'node-in', 'node-out', 'node-out-line', link, 20, 20);
         svg.selectAll('.sort-group').sort(function (a, b) {
           return 1;
         });
@@ -214,17 +202,25 @@ module.exports = function () {
           var linkLine = d3.select(this).append("line")
             .attr("stroke-width", 1.5)
             .attr("stroke", d3.hsl(188, .85, .56, .3));
-          var x1y1 = document.querySelector('#' + source + '_' + d.source).getAttribute('transform').substr(10).replace(')', '').split(',');
-          var x2y2 = document.querySelector('#' + target + '_' + d.target).getAttribute('transform').substr(10).replace(')', '').split(',');
+          var x1y1 = document.querySelector('#_' + d.source).getAttribute('transform').substr(10).replace(')', '').split(',');
+          var x2y2 = document.querySelector('#_' + d.target).getAttribute('transform').substr(10).replace(')', '').split(',');
           var x1 = parseFloat(x1y1[0]);
           var y1 = parseFloat(x1y1[1]);
           var x2 = parseFloat(x2y2[0]);
           var y2 = parseFloat(x2y2[1]);
           var hypotenuse = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
-          var offx1 = (x2 - x1) / hypotenuse * sourceRadius;
-          var offy1 = (y2 - y1) / hypotenuse * sourceRadius;
-          var offx2 = (x2 - x1) / hypotenuse * targetRadius;
-          var offy2 = (y2 - y1) / hypotenuse * targetRadius;
+          // 由于中心区域圆比较大，要调整半径。
+          if (x2 == 0 && y2 == 0) { // 指向中心
+            var offx1 = (x2 - x1) / hypotenuse * targetRadius;
+            var offy1 = (y2 - y1) / hypotenuse * targetRadius;
+            var offx2 = (x2 - x1) / hypotenuse * sourceRadius;
+            var offy2 = (y2 - y1) / hypotenuse * sourceRadius;
+          } else {
+            var offx1 = (x2 - x1) / hypotenuse * sourceRadius;
+            var offy1 = (y2 - y1) / hypotenuse * sourceRadius;
+            var offx2 = (x2 - x1) / hypotenuse * targetRadius;
+            var offy2 = (y2 - y1) / hypotenuse * targetRadius;
+          }
           var x1out = parseFloat(x1) + offx1;
           var y1out = parseFloat(y1) + offy1;
           var x2out = parseFloat(x2) - offx2;
@@ -295,7 +291,7 @@ module.exports = function () {
           .attr('class', nodeClass)
           .attr('opacity', '0')
           .attr('id', function (d, i) {
-            return nodeClass + '_' + d.id;
+            return '_' + d.id;
           })
           .transition()
           .ease(d3.easePoly.exponent(2))
@@ -359,6 +355,37 @@ module.exports = function () {
             nodeTextOut.attr('transform', 'translate(' + -x + ',' + -y + ')');
           }
           setTextOfcircle(nodeTextOut, isClockwise ? hudu : (2 * Math.PI - hudu));
+
+          var old = d3.select(this).attr('transform');
+          d3.select(this).on('mouseover', function (d) {
+            d3.select(this)
+              .transition()
+              .ease(d3.easePoly.exponent(2))
+              // .duration(animateTime)
+              .attr('transform', old + ' scale(1.5,1.5)');
+
+            tooltip.html(d.name + '<br />')
+              .style('left', (d3.event.pageX) + 'px')
+              .style('top', (d3.event.pageY + 20) + 'px')
+              .style('opacity', 1.0);
+          }).on('mousemove', function (d) {
+            d3.select(this)
+              .transition()
+              .ease(d3.easePoly.exponent(2))
+              // .duration(animateTime)
+              .attr('transform', old + ' scale(1.5,1.5)');
+
+            tooltip.style('left', (d3.event.pageX) + 'px')
+              .style('top', (d3.event.pageY + 20) + 'px');
+          }).on('mouseout', function (d) {
+            d3.select(this)
+              .transition()
+              .ease(d3.easePoly.exponent(2))
+              // .duration(animateTime)
+              .attr('transform', old);
+
+            tooltip.style('opacity', 0.0);
+          })
 
         });
         /**
@@ -440,7 +467,7 @@ module.exports = function () {
           .enter()
           .append('g')
           .attr('class', 'sun ' + domcss)
-          .attr('id', function (d, i) { return 'sun_' + i; })
+          .attr('id', function (d, i) { return '_' + i; })
           .attr('transform', 'translate(0,0)');
 
         dom.select('g.sun')
