@@ -1,7 +1,7 @@
 /**
  * @author hankaibo
  */
-module.exports = function init() {
+module.exports = function () {
   // menu init.
   $(function () {
     $('#side-menu').metisMenu();

@@ -16,8 +16,16 @@ require('bootstrap');
 require('metisMenu');
 require('../common/sb-admin-2.js');
 require('../common/d3-demo.js');
-
 var d3 = require('d3');
+
+/** d3-dashboard.js demo */
+(function(){
+  var dashboard = require('../common/d3-dashboard');
+  d3.select('.d3-dashboard').call(dashboard()
+    .backgroundColor(d3.hsl(.88,.5,.5))
+  );
+})();
+
 
 /** d3-ring-double.js demo */
 (function () {
@@ -201,7 +209,6 @@ var d3 = require('d3');
   d3.select('.d3-circle').call(circle1);
 })();
 
-
 /** d3-ring-single.js demo*/
 (function () {
   var ringSingle = require('../common/d3-ring-single')
@@ -285,4 +292,10 @@ var d3 = require('d3');
     .textBeforeEdgeStartOffset('15%') // 左上角内文字开始点，默认0
     .textBeforeEdgeDominantBaseline('text-before-edge'); // 左上角内文字的基线？这个属性没清楚。默认'text-before-edge'
   d3.select('.d3-ring-single-2').call(circle2);
+})();
+
+/** d3-slider.js demo */
+(function () {
+  var slider = require('../common/d3-slider');
+  d3.select('#slider').call(slider().value([10, 25]));
 })();
