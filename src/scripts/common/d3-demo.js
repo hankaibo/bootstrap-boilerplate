@@ -212,7 +212,7 @@ var d3 = require('d3');
         return scale(d);
       });
   }
-  render(data, alphabet, '#alphabet');
+  render(data, alphabet, '#alphabetOrdinal');
   render(data, d3.scaleOrdinal(d3.schemeCategory10), '#category10');
   render(data, d3.scaleOrdinal(d3.schemeCategory20), '#category20');
   render(data, d3.scaleOrdinal(d3.schemeCategory20b), '#category20b');

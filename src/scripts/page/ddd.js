@@ -22,7 +22,7 @@ var d3 = require('d3');
 (function(){
   var dashboard = require('../common/d3-dashboard');
   d3.select('.d3-dashboard').call(dashboard()
-    .backgroundColor(d3.hsl(.88,.5,.5))
+    .backgroundColor(d3.hsl(.88,.5,1))
   );
 })();
 

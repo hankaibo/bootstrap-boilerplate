@@ -8,6 +8,7 @@ exports = module.exports = function () {
   var width = 720;
   var height = 720;
   var backgroundColor = '#fff';
+  var transitonTime = 1000;
 
   // Private
   var tau = 2 * Math.PI;
@@ -15,6 +16,7 @@ exports = module.exports = function () {
 
   function chart(selection) {
     selection.each(function () {
+      var colors = d3.scaleOrdinal(d3.schemeCategory20);
       // svg区域
       var svg = d3.select(this).append('svg')
         .attr('width', width)
@@ -25,27 +27,59 @@ exports = module.exports = function () {
       // 中心区域
       createCenterArea(svg);
       // 创建轨道
-      createOrbit(svg);
+      common(svg);
 
+      svg.selectAll('path.arc')
+        .sort(function (a, b) {
+          return 1;
+        });
 
-      function createOrbit(dom) {
+      function common(dom) {
         var arc = d3.arc()
           .outerRadius(300)
           .innerRadius(260)
-          .startAngle(-pi / 2)
           .cornerRadius(50);
+
         var background = dom.append('path')
           .datum({ endAngle: pi / 2 })
           .style('fill', '#ddd')
-          .attr('d', arc);
-        var foreground = dom.append('path')
-          .datum({ endAngle: -pi / 2 })
-          .style('fill', 'orange')
-          .attr('d', arc);
+          .attr('d', arc({ startAngle: -pi / 2, endAngle: pi / 2 }));
 
-        foreground.transition()
-          .duration(4000)
-          .attrTween('d', arcTween(pi/2));
+        var dataInit = [
+          { startAngle: -pi / 2, endAngle: -pi / 2 },
+          { startAngle: -pi / 4, endAngle: -pi / 4 },
+          { startAngle: 0, endAngle: 0 },
+          { startAngle: pi / 4, endAngle: pi / 4 }
+        ];
+        var data = [
+          { startAngle: -pi / 2, endAngle: -pi / 4 },
+          { startAngle: -pi / 4, endAngle: 0 },
+          { startAngle: 0, endAngle: pi / 4 },
+          { startAngle: pi / 4, endAngle: pi / 2 }
+        ];
+        var foreground = dom.selectAll('path.arc')
+          .data(dataInit)
+          .enter()
+          .append('path')
+          .attr('class', 'arc')
+          .attr('id', function (d, i) {
+            return i;
+          })
+          .style('fill', function (d, i) {
+            return colors(i)
+          })
+          .attr('d', function (d, i) {
+            return arc(d)
+          });
+
+        foreground.each(function (d, i) {
+          d3.select(this)
+            .transition()
+            .duration(transitonTime)
+            .delay(transitonTime * i)
+            .attrTween('d', arcTween(data[i].endAngle));
+        });
+
 
         function arcTween(newAngle) {
           return function (d) {
@@ -56,7 +90,6 @@ exports = module.exports = function () {
             }
           }
         }
-
 
       }
 
