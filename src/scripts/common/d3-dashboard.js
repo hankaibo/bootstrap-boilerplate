@@ -24,24 +24,28 @@ exports = module.exports = function () {
         .style('background-color', backgroundColor)
         .append('g')
         .attr('transform', 'translate(' + width / 2 + ',' + height / 1.3 + ')');
+      // 箭头
+      createArrow(svg);
       // 中心区域
       createCenterArea(svg);
+      //
+      ceateInOrbit(svg);
       // 创建轨道
-      common(svg);
+      createOrbit(svg);
 
       svg.selectAll('path.arc')
         .sort(function (a, b) {
           return 1;
         });
 
-      function common(dom) {
+      // 创建轨道
+      function createOrbit(dom) {
         var arc = d3.arc()
           .outerRadius(300)
           .innerRadius(260)
           .cornerRadius(50);
 
         var background = dom.append('path')
-          .datum({ endAngle: pi / 2 })
           .style('fill', '#ddd')
           .attr('d', arc({ startAngle: -pi / 2, endAngle: pi / 2 }));
 
@@ -93,6 +97,49 @@ exports = module.exports = function () {
 
       }
 
+      // 创建内轨
+      function ceateInOrbit(dom) {
+        var arc = d3.arc()
+          .outerRadius(250)
+          .innerRadius(245)
+          .startAngle(-pi / 2)
+          .cornerRadius(10);
+
+        var background = dom.append('path')
+          .attr('class', 'in-arc')
+          .datum({ endAngle: -pi / 2 })
+          .style('fill', '#ddd')
+          .attr('d', arc)
+          .transition()
+          .duration(transitonTime * 2)
+          .attrTween('d', arcTween(pi / 2));
+
+        dom.append('line')
+          .attr('stroke-with', 1.5)
+          .attr('stroke', d3.hsl(188, .85, .56, .3))
+          .attr('x1', 0)
+          .attr('y1', 0)
+          .attr('x2', 245)
+          .attr('y2', 0)
+          .attr('marker-end', 'url(#arrow)')
+        transition()
+          .duration(animateTime)
+          .attr('x1', 0)
+          .attr('y1', 0)
+          .attr('x2', x2out)
+          .attr('y2', y2out);
+
+        function arcTween(newAngle) {
+          return function (d) {
+            var interpolate = d3.interpolate(d.endAngle, newAngle);
+            return function (t) {
+              d.endAngle = interpolate(t);
+              return arc(d);
+            }
+          }
+        }
+      }
+
       // 创建中心区域图
       function createCenterArea(dom) {
         var textArea = dom.append('g')
@@ -113,6 +160,27 @@ exports = module.exports = function () {
           .style('font-size', 48)
           .attr('fill', 'red')
           .text('BBBBBBBBBBBBB');
+      }
+
+      /**
+       * 创建三角形
+       *
+       * @param {any} dom 操作区域
+       */
+      function createArrow(dom) {
+        var defs = dom.append('defs');
+        var arrowMarker = defs.append('marker')
+          .attr('id', 'arrow')
+          .attr('markerUnits', 'strokeWidth')
+          .attr('markerWidth', '10')
+          .attr('markerHeight', '10')
+          .attr('refX', '0')
+          .attr('refY', '3')
+          .attr('orient', 'auto');
+        var arrow_path = "M0,0 L0,6 L9,3 z";
+        arrowMarker.append('path')
+          .attr('d', arrow_path)
+          .attr('fill', d3.hsl(188, .85, .56, .3));
       }
 
     });
