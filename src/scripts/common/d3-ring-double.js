@@ -57,7 +57,7 @@ module.exports = function () {
   var fourthQuadrantDominantBaselineOut = 'text-before-edge';
   var fourthQuadrantTextAnchorOut = 'start';
   var radiusOut = 300;
-  var backgroundColorOut = "#141d1f";
+  var backgroundColorOut = '#141d1f';
 
   var lightEffectImg = '';
   var lightEffectWidth = 0;
@@ -129,9 +129,9 @@ module.exports = function () {
       // dragZoomRotateControl(d3.select(this))
       //   .scaleExtent([0.25, 8])
       //   .duration(0)
-      //   .on("zoom", function () {
+      //   .on('zoom', function () {
       //     // _this.rotation(d3.event.rotation);
-      //     svg.attr("transform", d3.event.transform);
+      //     svg.attr('transform', d3.event.transform);
       //   });
 
       // 背景
@@ -199,9 +199,9 @@ module.exports = function () {
           .data(value);
 
         linkData.each(function (d, i) {
-          var linkLine = d3.select(this).append("line")
-            .attr("stroke-width", 1.5)
-            .attr("stroke", d3.hsl(188, .85, .56, .3));
+          var linkLine = d3.select(this).append('line')
+            .attr('stroke-width', 1.5)
+            .attr('stroke', d3.hsl(188, .85, .56, .3));
           var x1y1 = document.querySelector('#_' + d.source).getAttribute('transform').substr(10).replace(')', '').split(',');
           var x2y2 = document.querySelector('#_' + d.target).getAttribute('transform').substr(10).replace(')', '').split(',');
           var x1 = parseFloat(x1y1[0]);
@@ -234,7 +234,7 @@ module.exports = function () {
             .attr('y1', y1out)
             .attr('x2', x1out)
             .attr('y2', y1out)
-            .attr("marker-end", "url(#arrow)")
+            .attr('marker-end', 'url(#arrow)')
             .transition()
             .ease(d3.easePoly.exponent(2))
             .duration(animateTime)
@@ -250,19 +250,19 @@ module.exports = function () {
             .append('image')
             .attr('xlink:href', lightEffectImg)
             .attr('transform', 'translate(' + (-lightEffectWidth / 2) + ',' + (-lightEffectHeight / 2) + ')');
-          svg_mark.append("animateMotion")
-            .attr("path", function (d) {
-              return "M" + x1out + "," + y1out + "L" + x2out + "," + y2out;
+          svg_mark.append('animateMotion')
+            .attr('path', function (d) {
+              return 'M' + x1out + ',' + y1out + 'L' + x2out + ',' + y2out;
             })
-            .attr("dur", "2s")
-            .attr("begin", "0s")
-            .attr("repeatCount", "indefinite");
+            .attr('dur', '2s')
+            .attr('begin', '0s')
+            .attr('repeatCount', 'indefinite');
           svg_mark.append('animate')
             .attr('attributeName', 'opacity')
             .attr('values', '0;1;0')
-            .attr("dur", "2s")
-            .attr("begin", "0s")
-            .attr("repeatCount", "indefinite");
+            .attr('dur', '2s')
+            .attr('begin', '0s')
+            .attr('repeatCount', 'indefinite');
         });
 
       }
@@ -307,11 +307,11 @@ module.exports = function () {
         var nodeData = domg.selectAll('g.' + nodeClass)
           .data(value);
 
-        nodeData.append("image")
+        nodeData.append('image')
           .attr('transform', 'translate(' + -imgWidth / 2 + ',' + -imgHeight / 2 + ')')
-          .attr("width", imgWidth)
-          .attr("height", imgHeight)
-          .attr("xlink:href", function (d) { return d.img; });
+          .attr('width', imgWidth)
+          .attr('height', imgHeight)
+          .attr('xlink:href', function (d) { return d.img; });
         nodeData.append('text')
           .attr('class', nodeTextClass)
           .attr('x', 0)
@@ -322,7 +322,7 @@ module.exports = function () {
             // return d.name;
           });
         // nodeData.data().forEach(function(element,index){
-        // appendMultiText(nodeData, nodeTextClass, 'element.name1111111', 0, 0, radiusOut - radiusIn - 50, fontSize, fontColor, "simsun");
+        // appendMultiText(nodeData, nodeTextClass, 'element.name1111111', 0, 0, radiusOut - radiusIn - 50, fontSize, fontColor, 'simsun');
         // });
         nodeData.each(function (d, i) {
           if (isEquant) {
@@ -440,11 +440,11 @@ module.exports = function () {
       function createOrbit(dom, radius, orbitCS, orbitNum, orbitWidth, delay) {
         for (var i = 0; i < 1; i++) {
           // for (var i = 0; i < orbitNum; i++) {
-          dom.append("path")
-            .attr("class", "earthOrbitPosition")
-            .attr("d", d3.arc().outerRadius(radius + orbitWidth / 2).innerRadius(radius - orbitWidth / 2).startAngle(0).endAngle(2 * Math.PI))
-            // .attr("d", d3.arc().outerRadius(radius + orbitWidth / 2).innerRadius(radius - orbitWidth / 2).startAngle(2 * Math.PI * i / orbitNum).endAngle(2 * Math.PI * (i + 1) / orbitNum))
-            .style("fill", orbitCS(i))
+          dom.append('path')
+            .attr('class', 'earthOrbitPosition')
+            .attr('d', d3.arc().outerRadius(radius + orbitWidth / 2).innerRadius(radius - orbitWidth / 2).startAngle(0).endAngle(2 * Math.PI))
+            // .attr('d', d3.arc().outerRadius(radius + orbitWidth / 2).innerRadius(radius - orbitWidth / 2).startAngle(2 * Math.PI * i / orbitNum).endAngle(2 * Math.PI * (i + 1) / orbitNum))
+            .style('fill', orbitCS(i))
             .attr('opacity', '0')
             .transition()
             .duration(animateTime)
@@ -478,11 +478,11 @@ module.exports = function () {
         var nodeData = dom.select('g.sun')
           .data(value);
 
-        nodeData.append("image")
+        nodeData.append('image')
           .attr('transform', 'translate(' + -centerImgWidth / 2 + ',' + -centerImgHeight / 2 + ')')
-          .attr("width", centerImgWidth)
-          .attr("height", centerImgHeight)
-          .attr("xlink:href", function (d) { return d.img; });
+          .attr('width', centerImgWidth)
+          .attr('height', centerImgHeight)
+          .attr('xlink:href', function (d) { return d.img; });
         nodeData.append('text')
           .attr('class', 'sun_text')
           .attr('x', 0)
@@ -502,7 +502,7 @@ module.exports = function () {
        * @param {any} zindex 背景ID
        */
       function createBackground(dom, innerRadius, outerRadius, bgColor, zindex) {
-        dom.append("path")
+        dom.append('path')
           .attr('id', zindex)
           .attr('class', 'backgroundColorArc')
           .attr('fill', bgColor)
@@ -538,7 +538,7 @@ module.exports = function () {
           .attr('refX', '6')
           .attr('refY', '6')
           .attr('orient', 'auto');
-        var arrow_path = "M2,2 L10,6 L2,10 L6,6 L2,2";
+        var arrow_path = 'M2,2 L10,6 L2,10 L6,6 L2,2';
         arrowMarker.append('path')
           .attr('d', arrow_path)
           .attr('fill', d3.hsl(188, .85, .56, .3));
@@ -560,20 +560,20 @@ module.exports = function () {
       function appendMultiText(dom, domcss, str, posX, posY, width, fontsize, fontcolor, fontfamily) {
         var strs = splitByLine(str, width, fontsize);
 
-        var mulText = dom.append("text")
+        var mulText = dom.append('text')
           .attr('class', domcss)
-          .attr("x", posX)
-          .attr("y", posY)
+          .attr('x', posX)
+          .attr('y', posY)
           .style('fill', fontcolor)
-          .style("font-size", fontsize)
-          .style("font-family", fontfamily);
+          .style('font-size', fontsize)
+          .style('font-family', fontfamily);
 
-        mulText.selectAll("tspan")
+        mulText.selectAll('tspan')
           .data(strs)
           .enter()
-          .append("tspan")
-          .attr("x", mulText.attr("x"))
-          .attr("dy", "1em")
+          .append('tspan')
+          .attr('x', mulText.attr('x'))
+          .attr('dy', '1em')
           .text(function (d) {
             return d;
           });

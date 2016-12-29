@@ -19,10 +19,15 @@ require('../common/d3-demo.js');
 var d3 = require('d3');
 
 /** d3-dashboard.js demo */
-(function(){
+(function () {
   var dashboard = require('../common/d3-dashboard');
   d3.select('.d3-dashboard').call(dashboard()
-    .backgroundColor(d3.hsl(.88,.5,1))
+    .width(720)
+    .height(720)
+    .backgroundColor('#f99')
+    .lightEffectImg('../../img/1.png')
+    .lightEffectWidth(30)
+    .lightEffectHeight(30)
   );
 })();
 
@@ -173,29 +178,29 @@ var d3 = require('d3');
   var circle1 = ringDouble()
     .width(1280)
     .height(930)
-    .backgroundColor('#151617')  //背景色
+    .backgroundColor('#fff')  //背景色
     .value(value) // 小球数据，默认无
     .link(links) // 小球之间连接线，默认无
 
-    .backgroundColorIn('#13282b')
+    .backgroundColorIn('#fff')
     .orbitColor(['#5185dd', '#4199ca']) // 小球外切轨道的颜色，默认['#5185dd', '#4199ca']
-    .orbitWidth(.5) // 小球外切轨道的宽度，默认1
+    .orbitWidth(0) // 小球外切轨道的宽度，默认1
     .trackBall(20) // 小球外切轨道显示多少个小球，默认12
     .ballSize([60, 60]) // 小球的半径从小到大，默认[12,24]
     .ballTextOutSize(10) // 小球外文字大小，默认12
-    .ballTextOutColor('#fff') // 小球外文字颜色
+    .ballTextOutColor('#000') // 小球外文字颜色
     .firstQuadrantTextAnchor('start')
     .secondQuadrantTextAnchor('start')
     .thirdQuadrantTextAnchor('end')
     .fourthQuadrantTextAnchor('end')
 
-    .backgroundColorOut('#132528')
+    .backgroundColorOut('#fff')
     .orbitColorOut(['#5185dd', '#4199ca']) //
-    .orbitWidthOut(.5) //
+    .orbitWidthOut(0) //
     .trackBallOut(50) //
     .ballSizeOut([60, 60]) //
     .ballTextOutSizeOut(12) //
-    .ballTextOutColorOut('#fff')
+    .ballTextOutColorOut('#000')
     .firstQuadrantTextAnchorOut('start')
     .secondQuadrantTextAnchorOut('start')
     .thirdQuadrantTextAnchorOut('end')
@@ -263,7 +268,7 @@ var d3 = require('d3');
   var circle2 = ringSingle()
     .width(720) // 长度，默认720
     .height(720) // 宽度，默认720
-    .backgroundColor('#fff') // 画布的背景色，默认#fff
+    .backgroundColor('#f22') // 画布的背景色，默认#fff
     .value(value.slice(0, 30)) // 小球数据，默认无
     .isClockwise(false) // 小球排列顺序，默认true，顺时针
     .orbitColor(['#5185dd', '#4199ca']) // 小球外切轨道的颜色，默认[]，如果不设置则使用彩虹色
