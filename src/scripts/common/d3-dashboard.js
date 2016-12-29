@@ -5,39 +5,41 @@ var d3 = require('d3');
 exports = module.exports = function () {
   'use strict';
   // Public variables with default settings
-  var width = 720;
-  var height = 720;
+  var width = 360;
+  var height = 360;
   var backgroundColor = '#fff';
   var transitonTime = 2000;
 
   var centerTextValue = 82;
-  var centerTextValueFontSize = '24';
+  var centerTextValueFontSize = '28';
   var centerTextValueColor = 'green';
   var centerTextValueTextAnchor = 'middle';
   var centerTextValueX = 0;
-  var centerTextValueY = -50;
+  var centerTextValueY = -40;
+
   var centerArrowLineStrokeWidth = 3;
   var centerArrowLineStroke = 'red';
   var centerArrowLineX1 = 35;
   var centerArrowLineY1 = -50;
   var centerArrowLineX2 = 35;
   var centerArrowLineY2 = -70;
+
   var centerTextTitle = '良';
-  var centerTextTitleFontSize = '24';
+  var centerTextTitleFontSize = '28';
   var centerTextTitleColor = 'red';
   var centerTextTitleTextAnchor = 'middle';
   var centerTextTitleX = 0;
   var centerTextTitleY = 0;
 
-  var outerRadiusIn = 250;
-  var innerRadiusIn = 245;
+  var outerRadiusIn = 120;
+  var innerRadiusIn = 115;
   var startAngleIn = -Math.PI / 2;
   var endAngleIn = Math.PI / 2;
   var cornerRadiusIn = 10;
   var orbitColorIn = '#ddd';
 
-  var outerRadiusOut = 300;
-  var innerRadiusOut = 260;
+  var outerRadiusOut = 150;
+  var innerRadiusOut = 130;
   var startAngleOut = -Math.PI / 2;
   var endAngleOut = Math.PI / 2;
   var cornerRadiusOut = 50;
@@ -78,32 +80,31 @@ exports = module.exports = function () {
       // 创建刻度
       createScale(svg);
 
-
       svg.selectAll('path.arc')
         .sort(function (a, b) {
           return 1;
         });
       // 创建刻度
       function createScale(dom) {
-        var radius = 320;
+        var radius = 160;
         var arc = d3.arc()
-          .outerRadius(320)
-          .innerRadius(310)
+          .outerRadius(160)
+          .innerRadius(161)
           .startAngle(-pi / 2)
           .endAngle(pi / 2)
           .cornerRadius(10);
 
         var gr = dom.append('g')
-          .attr('class', 'r axis')
+          // .attr('class', 'r axis')
           .append('g');
         gr.append('path')
-          .style('fill', '#ddd')
+          .style('fill', '#fff')
           .attr('d', arc);
 
         var ga = dom.append('g')
           .attr('class', 'a axis')
           .selectAll('g')
-          .data(d3.range(0, 180, 3))
+          .data(d3.range(0, 180, 20))
           .enter()
           .append('g')
           .attr('transform', function (d) { return 'rotate(' + -(180 - d) + ')'; });
@@ -118,8 +119,6 @@ exports = module.exports = function () {
             return d > 0 && d < 90 ? 'rotate(180 ' + (radius + 6) + ',0)' : null;
           })
           .text(function (d) { return d; });
-
-
       }
 
       // 创建轨道
@@ -179,34 +178,51 @@ exports = module.exports = function () {
 
         var svg_mark = dom
           .append('g')
-          // .attr('transform', 'rotate(' + (180) + ')');
-          .attr('transform', 'translate(' + x2 + ',' + y2 + ')');
+        // .attr('transform', 'rotate(' + (180) + ')');
+        // .attr('transform', 'translate(' + x2 + ',' + y2 + ')');
         svg_mark
           .append('image')
           .attr('xlink:href', lightEffectImg)
           .attr('transform', 'translate(' + (-lightEffectWidth / 2) + ',' + (-lightEffectHeight / 2) + ')');
         svg_mark.append('animateMotion')
           .attr('path', function (d) {
-            return arc({endAngle:endAngleOut});
+            console.log(endAngleIn)
+            return arc({ endAngle: endAngleOut });
           })
-          .attr('dur', 20)
+          .attr('dur', 2)
           .attr('begin', '0s')
           .attr('repeatCount', 1);
 
-        // dom.append('line')
-        //   .attr('stroke-with', 10)
-        //   .attr('stroke', '#ddd')
-        //   .attr('x1', 0)
-        //   .attr('y1', 0)
-        //   .attr('x2', -innerRadiusIn)
-        //   .attr('y2', 0)
-        //   .attr('marker-end', 'url(#marker-arrow)')
-        //   .transition()
-        //   .duration(transitonTime)
-        //   .attr('x1', 0)
-        //   .attr('y1', 0)
-        //   .attr('x2', x2)
-        //   .attr('y2', -y2);
+
+        // 原三角形太小
+        var defs = dom.append('defs');
+        var arrowMarker = defs.append('marker')
+          .attr('id', 'marker-arrow-big')
+          .attr('markerUnits', 'strokeWidth')
+          .attr('markerWidth', '18')
+          .attr('markerHeight', '18')
+          .attr('refX', '0')
+          .attr('refY', '7')
+          .attr('orient', 'auto');
+        var arrow_path = 'M0,0 L0,14 L16,7 z';
+        arrowMarker.append('path')
+          .attr('d', arrow_path)
+          .attr('fill', 'red');
+
+        dom.append('line')
+          .attr('stroke-with', 0)
+          .attr('stroke', 'none')
+          .attr('x1', 0)
+          .attr('y1', 0)
+          .attr('x2', -innerRadiusIn)
+          .attr('y2', 0)
+          .attr('marker-end', 'url(#marker-arrow-big)')
+          .transition()
+          .duration(transitonTime)
+          .attr('x1', 0)
+          .attr('y1', 0)
+          .attr('x2', x2)
+          .attr('y2', -y2);
 
         function arcTween(newAngle) {
           return function (d) {
@@ -266,15 +282,15 @@ exports = module.exports = function () {
         var arrowMarker = defs.append('marker')
           .attr('id', 'marker-arrow')
           .attr('markerUnits', 'strokeWidth')
-          .attr('markerWidth', '13')
-          .attr('markerHeight', '13')
-          .attr('refX', '2')
-          .attr('refY', '6')
+          .attr('markerWidth', '8')
+          .attr('markerHeight', '8')
+          .attr('refX', '0')
+          .attr('refY', '2')
           .attr('orient', 'auto');
-        var arrow_path = 'M2,2 L2,11 L10,6 L2,2';
+        var arrow_path = 'M0,0 L0,4 L6,2 z';
         arrowMarker.append('path')
           .attr('d', arrow_path)
-          .attr('fill', '#000');
+          .attr('fill', 'red');
       }
 
     });

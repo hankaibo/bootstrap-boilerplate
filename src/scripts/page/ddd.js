@@ -22,9 +22,23 @@ var d3 = require('d3');
 (function () {
   var dashboard = require('../common/d3-dashboard');
   d3.select('.d3-dashboard').call(dashboard()
-    .width(720)
-    .height(720)
+    // 背景设置
+    .width(360)
+    .height(360)
     .backgroundColor('#f99')
+    // 中心数值文字设置
+    .centerTextValue(82)
+    .centerTextValueFontSize(34)
+    .centerTextValueColor('green')
+    // 中心箭头线设置
+    .centerArrowLineX1(50)
+    .centerArrowLineY1(-40)
+    .centerArrowLineX2(50)
+    .centerArrowLineY2(-60)
+    // 中心文本文字设置
+    .centerTextTitle('优')
+    .centerTextTitleFontSize(34)
+    .centerTextTitleColor('red')
     .lightEffectImg('../../img/1.png')
     .lightEffectWidth(30)
     .lightEffectHeight(30)
