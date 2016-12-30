@@ -54,6 +54,7 @@ exports = module.exports = function () {
   // Private
   var tau = 2 * Math.PI;
   var pi = Math.PI;
+  var n = 500;
   var p = d3.precisionFixed(0.05);
   var formatPost = d3.format('.' + p + 'f');
 
@@ -70,32 +71,37 @@ exports = module.exports = function () {
         .append('g')
         .attr('transform', 'translate(' + width / 2 + ',' + height / 1.3 + ')');
       // 三角形
-      createArrow(svg);
-      // 中心区域
-      createCenterArea(svg);
-      // 创建内轨道
-      ceateOrbitIn(svg);
-      // 创建外轨道
-      createOrbitOut(svg);
+      // createArrow(svg);
+      // // 中心区域
+      // createCenterArea(svg);
+      // // 创建内轨道
+      // ceateOrbitIn(svg);
+      // // 创建外轨道
+      // createOrbitOut(svg);
       // 创建刻度
       createScale(svg);
 
-      svg.selectAll('path.arc')
-        .sort(function (a, b) {
-          return 1;
-        });
-      // 创建刻度
+      // svg.selectAll('path.arc')
+      //   .sort(function (a, b) {
+      //     return 1;
+      //   });
+
+      /**
+       * 创建刻度
+       *
+       * @param {any} dom 操作区域
+       */
       function createScale(dom) {
-        var radius = 160;
+        var radius = 360;
         var arc = d3.arc()
-          .outerRadius(160)
-          .innerRadius(161)
+          .outerRadius(367)
+          .innerRadius(360)
           .startAngle(-pi / 2)
           .endAngle(pi / 2)
           .cornerRadius(10);
 
         var gr = dom.append('g')
-          // .attr('class', 'r axis')
+          .attr('class', 'r axis')
           .append('g');
         gr.append('path')
           .style('fill', '#fff')
@@ -104,7 +110,7 @@ exports = module.exports = function () {
         var ga = dom.append('g')
           .attr('class', 'a axis')
           .selectAll('g')
-          .data(d3.range(0, 180, 20))
+          .data(d3.range(0, 181, 45))
           .enter()
           .append('g')
           .attr('transform', function (d) { return 'rotate(' + -(180 - d) + ')'; });
@@ -118,45 +124,72 @@ exports = module.exports = function () {
           .attr('transform', function (d) {
             return d > 0 && d < 90 ? 'rotate(180 ' + (radius + 6) + ',0)' : null;
           })
-          .text(function (d) { return d; });
+          .text(function (d, i) {
+            return i * 25;
+          });
+
+
+        // -------------
+        var gaga1 = dom.append('g')
+          .attr('class', 'a axis')
+          .selectAll('g')
+          .data(d3.range(0, 181, 9))
+          .enter()
+          .append('g')
+          .attr('transform', function (d) { return 'rotate(' + -(180 - d) + ') '; });
+
+        gaga1.append('line')
+          .attr('stroke-width', 3)
+          .attr('stroke', 'green')
+          .attr('x1', -20)
+          .attr('y1', 0)
+          .attr('x2', 0)
+          .attr('y2', 0)
+          .attr('transform', 'translate(-400,0)');
       }
 
-      // 创建轨道
+      /**
+       * 创建轨道,就是仪表盘主体
+       *
+       * @param {any} dom 操作区域
+       */
       function createOrbitOut(dom) {
         var arc = d3.arc()
           .outerRadius(outerRadiusOut)
           .innerRadius(innerRadiusOut)
-          .startAngle(startAngleOut)
           .cornerRadius(cornerRadiusOut);
 
-        var background = dom.append('path')
-          .datum({ endAngle: endAngleOut })
+        dom.append('path')
+          .datum({ startAngle: startAngleOut, endAngle: endAngleOut })
           .style('fill', orbitBackgroundColorOut)
           .attr('d', arc);
 
-        var foreground = dom.append('path')
-          .datum({ endAngle: startAngleOut })
+        dom.selectAll('path.arc')
+          .data(d3.range(startAngleOut, endAngleOut, (endAngleOut - startAngleOut) / n))
+          .enter()
+          .append('path')
           .attr('class', 'arc')
-          .style('fill', orbitColorOut)
-          .attr('d', arc);
-
-        foreground.transition()
+          .style('fill', function (d, i) {
+            return d3.hsl(d * 360 / tau, 1, .5);
+          })
+          .transition()
           .duration(transitonTime)
-          .attrTween('d', arcTween(endAngleOut));
-
-        function arcTween(newAngle) {
-          return function (d) {
-            var interpolate = d3.interpolate(d.endAngle, newAngle);
+          .attrTween('d', function (d) {
+            var start = { startAngle: startAngleOut, endAngle: startAngleOut };
+            var end = { startAngle: d, endAngle: d + tau / n * 1.1 };
+            var interpolate = d3.interpolate(start, end);
             return function (t) {
-              d.endAngle = interpolate(t);
-              return arc(d);
-            }
-          }
-        }
+              return arc(interpolate(t));
+            };
+          });
 
       }
 
-      // 创建内轨
+      /**
+       * 创建内轨
+       *
+       * @param {any} dom 操作区域
+       */
       function ceateOrbitIn(dom) {
         var arc = d3.arc()
           .outerRadius(outerRadiusIn)
@@ -176,24 +209,6 @@ exports = module.exports = function () {
         var x2 = Math.sin(scaleOrbitIn(centerTextValue)) * outerRadiusIn;
         var y2 = Math.cos(scaleOrbitIn(centerTextValue)) * outerRadiusIn;
 
-        var svg_mark = dom
-          .append('g')
-        // .attr('transform', 'rotate(' + (180) + ')');
-        // .attr('transform', 'translate(' + x2 + ',' + y2 + ')');
-        svg_mark
-          .append('image')
-          .attr('xlink:href', lightEffectImg)
-          .attr('transform', 'translate(' + (-lightEffectWidth / 2) + ',' + (-lightEffectHeight / 2) + ')');
-        svg_mark.append('animateMotion')
-          .attr('path', function (d) {
-            console.log(endAngleIn)
-            return arc({ endAngle: endAngleOut });
-          })
-          .attr('dur', 2)
-          .attr('begin', '0s')
-          .attr('repeatCount', 1);
-
-
         // 原三角形太小
         var defs = dom.append('defs');
         var arrowMarker = defs.append('marker')
@@ -207,22 +222,23 @@ exports = module.exports = function () {
         var arrow_path = 'M0,0 L0,14 L16,7 z';
         arrowMarker.append('path')
           .attr('d', arrow_path)
-          .attr('fill', 'red');
+          .style('fill', 'red');
 
         dom.append('line')
           .attr('stroke-with', 0)
           .attr('stroke', 'none')
-          .attr('x1', 0)
-          .attr('y1', 0)
-          .attr('x2', -innerRadiusIn)
-          .attr('y2', 0)
-          .attr('marker-end', 'url(#marker-arrow-big)')
-          .transition()
-          .duration(transitonTime)
+          // .attr('x1', 0)
+          // .attr('y1', 0)
+          // .attr('x2', -innerRadiusIn)
+          // .attr('y2', 0)
+          // .attr('marker-end', 'url(#marker-arrow-big)')
+          // .transition()
+          // .duration(transitonTime)
           .attr('x1', 0)
           .attr('y1', 0)
           .attr('x2', x2)
-          .attr('y2', -y2);
+          .attr('y2', -y2)
+          .attr('marker-end', 'url(#marker-arrow-big)');
 
         function arcTween(newAngle) {
           return function (d) {
@@ -236,7 +252,11 @@ exports = module.exports = function () {
 
       }
 
-      // 创建中心区域图
+      /**
+       * 创建中心区域图
+       *
+       * @param {any} dom 操作区域
+       */
       function createCenterArea(dom) {
         var textArea = dom.append('g')
           .attr('class', 'center-text');
@@ -248,7 +268,7 @@ exports = module.exports = function () {
           .attr('class', 'center-text-value')
           .attr('x', centerTextValueX)
           .attr('y', centerTextValueY)
-          .attr('fill', centerTextValueColor)
+          .style('fill', centerTextValueColor)
           .style('font-size', centerTextValueFontSize)
           .style('text-anchor', centerTextValueTextAnchor)
           .text(formatPost(centerTextValue));
@@ -266,31 +286,31 @@ exports = module.exports = function () {
           .attr('class', 'center-text-title')
           .attr('x', centerTextTitleX)
           .attr('y', centerTextTitleY)
-          .attr('fill', centerTextTitleColor)
+          .style('fill', centerTextTitleColor)
           .style('font-size', centerTextTitleFontSize)
           .style('text-anchor', centerTextTitleTextAnchor)
           .text(centerTextTitle);
       }
 
       /**
-       * 创建三角形
+       * 创建三角形(该三角形大小为4*4，如有特殊要求，请重绘制。)
        *
        * @param {any} dom 操作区域
        */
-      function createArrow(dom) {
+      function createArrow(dom, params) {
         var defs = dom.append('defs');
         var arrowMarker = defs.append('marker')
           .attr('id', 'marker-arrow')
           .attr('markerUnits', 'strokeWidth')
-          .attr('markerWidth', '8')
-          .attr('markerHeight', '8')
+          .attr('markerWidth', '4')
+          .attr('markerHeight', '4')
           .attr('refX', '0')
-          .attr('refY', '2')
+          .attr('refY', '1.5')
           .attr('orient', 'auto');
-        var arrow_path = 'M0,0 L0,4 L6,2 z';
+        var arrow_path = 'M0,0 L0,3 L4,1.5 z';
         arrowMarker.append('path')
           .attr('d', arrow_path)
-          .attr('fill', 'red');
+          .style('fill', 'red');
       }
 
     });

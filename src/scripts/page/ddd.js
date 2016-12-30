@@ -23,18 +23,18 @@ var d3 = require('d3');
   var dashboard = require('../common/d3-dashboard');
   d3.select('.d3-dashboard').call(dashboard()
     // 背景设置
-    .width(360)
-    .height(360)
+    .width(960)
+    .height(960)
     .backgroundColor('#f99')
     // 中心数值文字设置
-    .centerTextValue(82)
+    .centerTextValue(62)
     .centerTextValueFontSize(34)
     .centerTextValueColor('green')
     // 中心箭头线设置
     .centerArrowLineX1(50)
     .centerArrowLineY1(-40)
     .centerArrowLineX2(50)
-    .centerArrowLineY2(-60)
+    .centerArrowLineY2(-55)
     // 中心文本文字设置
     .centerTextTitle('优')
     .centerTextTitleFontSize(34)
@@ -42,6 +42,10 @@ var d3 = require('d3');
     .lightEffectImg('../../img/1.png')
     .lightEffectWidth(30)
     .lightEffectHeight(30)
+    // 内轨轨道设置
+    .outerRadiusIn(120)
+    .innerRadiusIn(117)
+    .orbitColorIn('#ccc')
   );
 })();
 
