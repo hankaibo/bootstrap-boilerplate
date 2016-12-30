@@ -5,8 +5,8 @@ var d3 = require('d3');
 exports = module.exports = function () {
   'use strict';
   // Public variables with default settings
-  var width = 360;
-  var height = 360;
+  var width = 400;
+  var height = 250;
   var backgroundColor = '#fff';
   var transitonTime = 2000;
 
@@ -19,10 +19,10 @@ exports = module.exports = function () {
 
   var centerArrowLineStrokeWidth = 3;
   var centerArrowLineStroke = 'red';
-  var centerArrowLineX1 = 35;
-  var centerArrowLineY1 = -50;
-  var centerArrowLineX2 = 35;
-  var centerArrowLineY2 = -70;
+  var centerArrowLineX1 = 50;
+  var centerArrowLineY1 = -40;
+  var centerArrowLineX2 = 50;
+  var centerArrowLineY2 = -55;
 
   var centerTextTitle = '良';
   var centerTextTitleFontSize = '28';
@@ -50,6 +50,10 @@ exports = module.exports = function () {
   var lightEffectWidth = 0;
   var lightEffectHeight = 0;
 
+  var scaleRadius = 150;
+  var scaleColor = '#000';
+  var scaleTextColor='#eff0f1';
+
 
   // Private
   var tau = 2 * Math.PI;
@@ -67,17 +71,19 @@ exports = module.exports = function () {
       var svg = d3.select(this).append('svg')
         .attr('width', width)
         .attr('height', height)
+        .attr('viewBox', '0 0 400 250')
+        .attr('preserveAspectRatio', 'xMidYMid meet')
         .style('background-color', backgroundColor)
         .append('g')
-        .attr('transform', 'translate(' + width / 2 + ',' + height / 1.3 + ')');
+        .attr('transform', 'translate(' + 200 + ',' + 220 + ')');
       // 三角形
-      // createArrow(svg);
-      // // 中心区域
-      // createCenterArea(svg);
-      // // 创建内轨道
-      // ceateOrbitIn(svg);
-      // // 创建外轨道
-      // createOrbitOut(svg);
+      createArrow(svg);
+      // 中心区域
+      createCenterArea(svg);
+      // 创建内轨道
+      ceateOrbitIn(svg);
+      // 创建外轨道
+      createOrbitOut(svg);
       // 创建刻度
       createScale(svg);
 
@@ -92,20 +98,12 @@ exports = module.exports = function () {
        * @param {any} dom 操作区域
        */
       function createScale(dom) {
-        var radius = 360;
         var arc = d3.arc()
-          .outerRadius(367)
-          .innerRadius(360)
+          .outerRadius(scaleRadius)
+          .innerRadius(scaleRadius)
           .startAngle(-pi / 2)
           .endAngle(pi / 2)
           .cornerRadius(10);
-
-        var gr = dom.append('g')
-          .attr('class', 'r axis')
-          .append('g');
-        gr.append('path')
-          .style('fill', '#fff')
-          .attr('d', arc);
 
         var ga = dom.append('g')
           .attr('class', 'a axis')
@@ -116,13 +114,14 @@ exports = module.exports = function () {
           .attr('transform', function (d) { return 'rotate(' + -(180 - d) + ')'; });
 
         ga.append('text')
-          .attr('x', radius + 6)
+          .attr('x', scaleRadius + 25)
           .attr('dy', '.35em')
+          .style('fill',scaleTextColor)
           .style('text-anchor', function (d) {
             return d > 0 && d < 90 ? 'end' : null;
           })
           .attr('transform', function (d) {
-            return d > 0 && d < 90 ? 'rotate(180 ' + (radius + 6) + ',0)' : null;
+            return d > 0 && d < 90 ? 'rotate(180 ' + (scaleRadius + 25) + ',0)' : null;
           })
           .text(function (d, i) {
             return i * 25;
@@ -136,16 +135,16 @@ exports = module.exports = function () {
           .data(d3.range(0, 181, 9))
           .enter()
           .append('g')
-          .attr('transform', function (d) { return 'rotate(' + -(180 - d) + ') '; });
+          .attr('transform', function (d) { return 'rotate(' + d + ') '; });
 
         gaga1.append('line')
-          .attr('stroke-width', 3)
-          .attr('stroke', 'green')
-          .attr('x1', -20)
+          .attr('stroke-width', 1)
+          .attr('stroke', scaleColor)
+          .attr('x1', -10)
           .attr('y1', 0)
           .attr('x2', 0)
           .attr('y2', 0)
-          .attr('transform', 'translate(-400,0)');
+          .attr('transform', 'translate(-' + (scaleRadius + 10) + ',0)');
       }
 
       /**
@@ -170,7 +169,7 @@ exports = module.exports = function () {
           .append('path')
           .attr('class', 'arc')
           .style('fill', function (d, i) {
-            return d3.hsl(d * 360 / tau, 1, .5);
+            return d3.hsl(280 + d * 360 / tau, 1, .5);
           })
           .transition()
           .duration(transitonTime)
@@ -581,6 +580,27 @@ exports = module.exports = function () {
       return lightEffectHeight;
     }
     lightEffectHeight = _;
+    return chart;
+  };
+  chart.scaleRadius = function (_) {
+    if (!arguments.length) {
+      return scaleRadius;
+    }
+    scaleRadius = _;
+    return chart;
+  };
+  chart.scaleColor = function (_) {
+    if (!arguments.length) {
+      return scaleColor;
+    }
+    scaleColor = _;
+    return chart;
+  };
+  chart.scaleTextColor = function (_) {
+    if (!arguments.length) {
+      return scaleTextColor;
+    }
+    scaleTextColor = _;
     return chart;
   };
 
