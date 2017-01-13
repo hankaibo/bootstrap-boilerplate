@@ -964,7 +964,7 @@ void function () {
     .lightEffectHeight(12);
 
 
-  d3.select('.d3-circle').call(circle1);
+  d3.select('.d3-circle-double').call(circle1);
 })();
 
 /** d3-ring-single.js demo*/
@@ -1019,8 +1019,6 @@ void function () {
   d3.select('.d3-ring-single-1').call(circle1);
 
   var circle2 = ringSingle()
-    .width(720) // 长度，默认720
-    .height(720) // 宽度，默认720
     .backgroundColor('#f22') // 画布的背景色，默认#fff
     .value(value.slice(0, 30)) // 小球数据，默认无
     .isClockwise(false) // 小球排列顺序，默认true，顺时针
@@ -1062,7 +1060,7 @@ void function () {
 (function () {
   require('./d3-utils-solar-calculator');
   //
-  var svg = d3.select("svg"),
+  var svg = d3.select("svg.solar"),
     width = +svg.attr("width"),
     height = +svg.attr("height"),
     scale = width * .45;
@@ -1220,4 +1218,4 @@ void function () {
       -k * Math.sin(φ)
     ];
   }
-})();
+})//();

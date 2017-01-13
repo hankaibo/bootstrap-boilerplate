@@ -6,8 +6,6 @@ exports = module.exports = function () {
   'use strict';
   // Public variables with default settings
   // 画布相关属性
-  var width = 720;
-  var height = 720;
   var backgroundColor = '#fff';
   // 数据
   var value;
@@ -64,6 +62,15 @@ exports = module.exports = function () {
 
   function chart(selection) {
     selection.each(function () {
+      var svg = d3.select('svg');
+      var width = +svg.attr('width');
+      var height = +svg.attr('height');
+      var radius = Math.min(width, height);
+      var radii = {
+        'sun': radius / 8,
+        'earthOrbit': radius / 3,
+        'rectArea': Math.sqrt(Math.pow(radius * .8, 2) / 2)
+      };
       // 轨道颜色比例尺
       var orbitColorScale = d3.scaleLinear()
         .domain([0, ballNum])
@@ -72,13 +79,6 @@ exports = module.exports = function () {
       var ballSizeScale = d3.scaleLinear()
         .domain([0, ballNum])
         .rangeRound([ballSize[1], ballSize[0]]);
-      // 画布中一些宽度常量
-      var radius = Math.min(width, height);
-      var radii = {
-        'sun': radius / 8,
-        'earthOrbit': radius / 3,
-        'rectArea': Math.sqrt(Math.pow(radius * .8, 2) / 2)
-      };
       var tooltip = selection.append('div')
         .attr('class', 'tooltip')
         .style('opacity', 0.0);
@@ -89,21 +89,18 @@ exports = module.exports = function () {
         .startAngle(textPathArc[0])
         .endAngle(textPathArc[1]);
 
-      // svg区域
-      var svg = d3.select(this).append('svg')
-        .attr('width', width)
-        .attr('height', height)
-        .style('background-color', backgroundColor)
+      // 操作区域
+      var dom=svg.style('background-color', backgroundColor)
         .append('g')
         .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
       // 中心区域
-      createCenterArea(svg);
+      createCenterArea(dom);
       // 轨道
-      createOrbit(svg);
+      createOrbit(dom);
       // 创建圆
-      createCircle(svg);
+      createCircle(dom);
       // 创建文字
-      createText(svg);
+      createText(dom);
 
       // 创建文字
       function createText(dom) {
@@ -269,34 +266,20 @@ exports = module.exports = function () {
         if (orbitRainbow) {
           orbit.style('fill', function (d) { return d3.hsl(d * 360 / twoPI, 1, .5); });
         } else {
-          orbit.style("fill", function (d, i) { return orbitColorScale(i); });
+          orbit.style('fill', function (d, i) { return orbitColorScale(i); });
         }
       }
       // 创建中心区域图
       function createCenterArea(dom) {
-        dom.append("circle")
-          .attr("class", "sun")
-          .attr("r", radii.sun)
-          .style("fill", "none");
+        dom.append('circle')
+          .attr('class', 'sun')
+          .attr('r', radii.sun)
+          .style('fill', 'none');
       }
     });
   }
 
   // Getter/setter function
-  chart.width = function (_) {
-    if (!arguments.length) {
-      return width;
-    }
-    width = _;
-    return chart;
-  };
-  chart.height = function (_) {
-    if (!arguments.length) {
-      return height;
-    }
-    height = _;
-    return chart;
-  };
   chart.backgroundColor = function (_) {
     if (!arguments.length) {
       return backgroundColor;
