@@ -13,6 +13,9 @@ exports = module.exports = function () {
   var isClockwise = true;
   var orbitColor = [];
   var orbitWidth = 1;
+  var orbitStartAngle = 0;
+  var orbitEndAngle = 2 * Math.PI;
+  var transitonTime = 3000;
   // 小圆球相关属性
   var ballNum = 12;
   var ballSize = [12, 24];
@@ -45,7 +48,7 @@ exports = module.exports = function () {
   // Private variables
   // 弧度常量
   var PI = Math.PI;
-  var twoPI = 2 * PI;
+  var tau = 2 * PI;
   var n = 500;
   // 轨道默认颜色是否使用彩虹色
   var orbitRainbow = true;
@@ -79,9 +82,6 @@ exports = module.exports = function () {
       var ballSizeScale = d3.scaleLinear()
         .domain([0, ballNum])
         .rangeRound([ballSize[1], ballSize[0]]);
-      var tooltip = selection.append('div')
-        .attr('class', 'tooltip')
-        .style('opacity', 0.0);
       // Current position of Text in its orbit
       var textOrbitPosition = d3.arc()
         .outerRadius(radii.earthOrbit + 1)
@@ -90,15 +90,15 @@ exports = module.exports = function () {
         .endAngle(textPathArc[1]);
 
       // 操作区域
-      var dom=svg.style('background-color', backgroundColor)
+      var dom = svg.style('background-color', backgroundColor)
         .append('g')
         .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
       // 中心区域
       createCenterArea(dom);
-      // 轨道
-      createOrbit(dom);
       // 创建圆
       createCircle(dom);
+      // 轨道
+      createOrbit(dom);
       // 创建文字
       createText(dom);
 
@@ -142,7 +142,9 @@ exports = module.exports = function () {
           .data(value)
           .enter()
           .append('g')
-          .attr('class', 'node');
+          .attr('class', 'node')
+          .attr('id', function (d) { return 'g_circle_' + d.id })
+          .attr('opacity', .5);
 
         dom.selectAll('g.node')
           .data(value)
@@ -155,7 +157,9 @@ exports = module.exports = function () {
           .attr('class', 'node-circle')
           .attr('id', function (d) { return d.id; })
           .attr('r', function (d, i) { return ballSizeScale(i); })
-          .style('fill', function (d, i) { return orbitColorScale(i); });
+          .style('fill', function (d, i) {
+            return orbitRainbow ? d3.hsl(d * 1360 / tau, 1, .5) : orbitColorScale(i);
+          });
         nodeData.append('clipPath')
           .attr('class', 'node-clipPath')
           .attr('id', function (d) { return 'clip-' + d.id; })
@@ -182,7 +186,7 @@ exports = module.exports = function () {
           .text(function (d) { return d.name; });
         nodeData.each(function (d, i) {
           if (isEquant) {
-            hudu = (i + 0) * (2 * Math.PI / ballNum);
+            hudu = tau * (i / ballNum);
           } else {
             if (i == 0) {
               d3.select(this).attr('transform', 'translate(' + 0 + ',' + -(radii.earthOrbit + ballSizeScale(i)) + ')');
@@ -194,29 +198,32 @@ exports = module.exports = function () {
               hudu += Math.acos(cosc);
             }
           }
-          X = Math.sin(isClockwise ? hudu : (2 * Math.PI - hudu)) * (radii.earthOrbit + ballSizeScale(i));
-          Y = Math.cos(isClockwise ? hudu : (2 * Math.PI - hudu)) * (radii.earthOrbit + ballSizeScale(i));
+          X = Math.sin(isClockwise ? hudu : (tau - hudu)) * (radii.earthOrbit + ballSizeScale(i));
+          Y = Math.cos(isClockwise ? hudu : (tau - hudu)) * (radii.earthOrbit + ballSizeScale(i));
           d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
-          x = Math.sin(isClockwise ? (2 * Math.PI - hudu) : hudu) * ballSizeScale(i);
-          y = Math.cos(isClockwise ? (2 * Math.PI - hudu) : hudu) * ballSizeScale(i);
+          x = Math.sin(isClockwise ? (tau - hudu) : hudu) * ballSizeScale(i);
+          y = Math.cos(isClockwise ? (tau - hudu) : hudu) * ballSizeScale(i);
           var nodeTextOut = d3.select(this).select('text.node-text-out')
             .attr('transform', 'translate(' + x + ',' + y + ')');
           // setTextOfcircle(nodeTextOut, acos);
-          setTextOfcircle(nodeTextOut, isClockwise ? hudu : (2 * Math.PI - hudu));
+          setTextOfcircle(nodeTextOut, isClockwise ? hudu : (tau - hudu));
 
-          d3.select(this).on('mouseover', function (d) {
-            tooltip.html(d.name + '<br />' +
-              '排名' + d.ranking + '<br />')
-              .style('left', (d3.event.pageX) + 'px')
-              .style('top', (d3.event.pageY + 20) + 'px')
-              .style('opacity', 1.0);
-          }).on('mousemove', function (d) {
-            tooltip.style('left', (d3.event.pageX) + 'px')
-              .style('top', (d3.event.pageY + 20) + 'px');
-          }).on('mouseout', function (d) {
-            tooltip.style('opacity', 0.0);
-          })
         });
+
+        dom.selectAll('g.node').each(function (d, i) {
+          console.log(d3.select(this).attr('id'));
+          d3.select(this).append('animate')
+            .attr('attributeName', 'opacity')
+            .attr('values', '1')
+            // .attr('begin', 0)
+            .attr('begin', function (d, i) {
+              return i == 0 ? '0s' : d3.select(this).attr('id') + '.end'
+            })
+            .attr('dur', transitonTime / 1000)
+            .attr('repeatCount', '1');
+        });
+
+
 
         // 小圆文字布局
         function setTextOfcircle(dom, hudu) {
@@ -231,7 +238,7 @@ exports = module.exports = function () {
             execTextOfcircleLayout(dom, fourthQuadrantDominantBaseline, fourthQuadrantTextAnchor);
           }
           // 对特殊角度进行单独设置
-          if (hudu == 0 || hudu == 2 * Math.PI) {
+          if (hudu == 0 || hudu == tau) {
             execTextOfcircleLayout(dom, 'text-before-edge', 'middle');
           } else if (hudu == Math.PI * .5) {
             execTextOfcircleLayout(dom, 'central', 'end');
@@ -247,29 +254,42 @@ exports = module.exports = function () {
             .attr('text-anchor', textAnchor);
         }
       }
+
       /**
        * 创建轨道
        *
        * @param {any} dom 操作区域
        */
       function createOrbit(dom) {
+        var arc = d3.arc()
+          .outerRadius(radii.earthOrbit + orbitWidth / 2)
+          .innerRadius(radii.earthOrbit - orbitWidth / 2);
+
         var orbit = dom.selectAll('path')
-          .data(d3.range(0, twoPI, twoPI / n))
+          .data(d3.range(orbitStartAngle, orbitEndAngle, Math.abs(orbitEndAngle - orbitStartAngle) / n))
           .enter()
           .append('path')
           .attr('class', 'earthOrbitPosition')
-          .attr('d', d3.arc()
-            .outerRadius(radii.earthOrbit + orbitWidth / 2)
-            .innerRadius(radii.earthOrbit - orbitWidth / 2)
-            .startAngle(function (d) { return d; })
-            .endAngle(function (d) { return d + twoPI / n * 1.1; })); // 1.1可以避免出现块裂痕
-        if (orbitRainbow) {
-          orbit.style('fill', function (d) { return d3.hsl(d * 360 / twoPI, 1, .5); });
-        } else {
-          orbit.style('fill', function (d, i) { return orbitColorScale(i); });
-        }
+          .style('fill', function (d, i) {
+            return orbitRainbow ? d3.hsl(d * 360 / tau, 1, .5) : orbitColorScale(i);
+          })
+          .transition()
+          .duration(transitonTime)
+          .attrTween('d', function (d) {
+            var start = { startAngle: orbitStartAngle, endAngle: orbitStartAngle };
+            var end = { startAngle: d, endAngle: d + Math.abs(orbitEndAngle - orbitStartAngle) / n * 1.1 };
+            var interpolate = d3.interpolate(start, end);
+            return function (t) {
+              return arc(interpolate(t))
+            }
+          });
       }
-      // 创建中心区域图
+
+      /**
+       * 创建中心区域图
+       *
+       * @param {any} dom 操作区域
+       */
       function createCenterArea(dom) {
         dom.append('circle')
           .attr('class', 'sun')

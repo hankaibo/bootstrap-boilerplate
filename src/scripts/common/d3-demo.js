@@ -1008,7 +1008,7 @@ void function () {
     .orbitWidth(10) // 小球外切轨道的宽度，默认1
     .ballNum(30) // 小球外切轨道显示多少个小球，默认12
     .ballSize([15, 35]) // 小球的半径从小到大，默认[12,24]
-    .isEquant(false) // 是否等分分布小圆，默认true
+    .isEquant(true) // 是否等分分布小圆，默认true
     .ballTextOutSize(14) // 小球外文字大小，默认12
     .textPathArc([2 * Math.PI * .85, 2 * Math.PI])
     .textAfterEdge('NBA各队') // 左上角外文字，默认空
