@@ -17,10 +17,10 @@ require('../common/sb-admin-2.js');
 
 // tooltip demo
 $('.tooltip-demo').tooltip({
-  selector: "[data-toggle=tooltip]",
-  container: "body"
+  selector: '[data-toggle=tooltip]',
+  container: 'body'
 })
 
 // popover demo
-$("[data-toggle=popover]")
+$('[data-toggle=popover]')
   .popover()

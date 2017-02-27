@@ -10,5 +10,4 @@ require('../../styles/common/sb-admin-2.less');
  */
 require('jquery');
 require('bootstrap');
-require('metisMenu');
 require('../common/sb-admin-2.js');

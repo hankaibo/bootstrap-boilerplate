@@ -7,7 +7,7 @@
   } else {
     root.d3.progressRadial = factory(root.d3);
   }
-} (this, function (d3) {
+}(this, function (d3) {
   // exposed methods
   return function module() {
     'use strict';
@@ -142,6 +142,7 @@
       });
       return uuid;
     }
+
     function appendMultiText(container, str, posX, posY, width, fontsize, fontfamily) {
 
       if (arguments.length < 6) {
@@ -149,23 +150,23 @@
       }
 
       if (arguments.length < 7) {
-        fontfamily = "simsun, arial";
+        fontfamily = 'simsun, arial';
       }
 
       var strs = splitByLine(str, width, fontsize);
 
-      var mulText = container.append("text")
-        .attr("x", posX)
-        .attr("y", posY)
-        .style("font-size", fontsize)
-        .style("font-family", fontfamily);
+      var mulText = container.append('text')
+        .attr('x', posX)
+        .attr('y', posY)
+        .style('font-size', fontsize)
+        .style('font-family', fontfamily);
 
-      mulText.selectAll("tspan")
+      mulText.selectAll('tspan')
         .data(strs)
         .enter()
-        .append("tspan")
-        .attr("x", mulText.attr("x"))
-        .attr("dy", "1em")
+        .append('tspan')
+        .attr('x', mulText.attr('x'))
+        .attr('dy', '1em')
         .text(function (d) {
           return d;
         });
@@ -175,7 +176,8 @@
       function splitByLine(str, max, fontsize) {
         var curLen = 0;
         var result = [];
-        var start = 0, end = 0;
+        var start = 0,
+          end = 0;
         for (var i = 0; i < str.length; i++) {
           var code = str.charCodeAt(i);
           var pixelLen = code > 255 ? fontsize : fontsize / 2;

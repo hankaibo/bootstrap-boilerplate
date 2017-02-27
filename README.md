@@ -17,8 +17,8 @@
 ## 依赖
 
 你需要以下环境:
-* node 5.0+
 * Git
+* node 5.0+
 * python 2.7
 
 ## 安装
@@ -43,7 +43,7 @@ $ npm install
 npm start
 ```
 
-它会开启一个本地的'webpack-dev-server'服务器，监视、编译（内存中）文件的发动，并重新加载。
+它会启动一个本地的'webpack-dev-server'服务器，监视、编译（内存中）文件的改动，并重新加载。
 浏览地址为 `http://localhost:8080`。
 
 ## 开发

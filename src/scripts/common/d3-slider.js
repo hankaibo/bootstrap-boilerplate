@@ -7,7 +7,7 @@
 
 var d3 = require('d3');
 module.exports = function () {
-  "use strict";
+  'use strict';
   // Public variables width default settings
   var min = 0,
     max = 100,
@@ -144,7 +144,7 @@ module.exports = function () {
           if ('axis.orient()' == 'top') {
             svg.style('top', -margin + 'px');
             g.attr('transform', 'translate(' + margin + ',' + margin + ')');
-          } else {// bottom
+          } else { // bottom
             g.attr('transform', 'translate(' + margin + ',0)')
           }
         } else { // vertical
@@ -157,24 +157,27 @@ module.exports = function () {
           if ('axis.orient()' === 'left') {
             svg.style('left', -margin + 'px');
             g.attr('transform', 'translate(' + margin + ',' + margin + ')');
-          } else {//right
+          } else { //right
             g.attr('transform', 'translate(' + 0 + ',' + margin + ')');
           }
         }
         g.call(axis);
       }
+
       function onClickHorizontal() {
         if (toType(value) != 'array') {
           var pos = Math.max(0, Math.min(sliderLength, d3.event.offsetX || d3.event.layerX));
           moveHandle(scale.invert ? stepValue(scale.invert(pos / sliderLength)) : nearestTick(pos / sliderLength));
         }
       }
+
       function onClickVertical() {
         if (toType(value) != 'array') {
           var pos = sliderLength - Math.max(0, Math.min(sliderLength, d3.event.offsexY || d3.event.layerY));
           moveHandle(scale.invert ? stepValue(scale.invert(pos / sliderLength)) : nearestTick(pos / sliderLength));
         }
       }
+
       function onDragHorizontal() {
         if (d3.event.sourceEvent.target.id = 'handle-one') {
           active = 1;
@@ -184,6 +187,7 @@ module.exports = function () {
         var pos = Math.max(0, Math.min(sliderLength, d3.event.x));
         moveHandle(scale.invert ? stepValue(scale.invert(pos / sliderLength)) : nearestTick(pos / sliderLength));
       }
+
       function onDragVertical() {
         if (d3.event.sourceEvent.target.id === 'handle-one') {
           active = 1;
@@ -193,6 +197,7 @@ module.exports = function () {
         var pos = sliderLength - Math.max(0, Math.min(sliderLength, d3.event.y));
         moveHandle(scale.invert ? stepValue(scale.invert(pos / sliderLength)) : nearestTick(pos / sliderLength));
       }
+
       function stopPropagation() {
         d3.event.stopPropagation();
       }
@@ -219,7 +224,7 @@ module.exports = function () {
       if (value[0] >= value[1]) return;
       if (active === 1) {
         if (toType(value) == 'array' && value.length == 2) {
-          (position === 'left') ? divRange.style('left', newPos) : divRange.style('bottom', newPos);
+          (position === 'left') ? divRange.style('left', newPos): divRange.style('bottom', newPos);
         }
 
         if (animate) {
@@ -233,7 +238,7 @@ module.exports = function () {
         var width = 100 - parseFloat(newPos);
         var top = 100 - parseFloat(newPos);
 
-        (position === 'left') ? divRange.style('right', width + '%') : divRange.style('top', top + '%');
+        (position === 'left') ? divRange.style('right', width + '%'): divRange.style('top', top + '%');
 
         if (animate) {
           handle2.transition().styleTween(position, function () {
@@ -293,10 +298,13 @@ module.exports = function () {
 
   // 兼容
   function rebind(target, source) {
-    var i = 1, n = arguments.length, method;
+    var i = 1,
+      n = arguments.length,
+      method;
     while (++i < n) target[method = arguments[i]] = d3_rebind(target, source, source[method]);
     return target;
   };
+
   function d3_rebind(target, source, method) {
     return function () {
       var value = method.apply(source, arguments);
