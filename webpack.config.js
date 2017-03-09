@@ -12,6 +12,7 @@ var helpers = require('./helpers');
 var autoprefixer = require('autoprefixer');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 /*
  * Webpack Constants
@@ -27,9 +28,8 @@ module.exports = function makeWebpackConfig() {
   if (isProd) {
     config.devtool = 'source-map';
   } else {
-    config.devtool = 'cheap-source-map';
+    config.devtool = 'eval-source-map';
   }
-  config.debug = !isProd;
   config.entry = entries;
   config.output = {
     path: helpers.root('dist'),
@@ -37,35 +37,32 @@ module.exports = function makeWebpackConfig() {
     filename: isProd ? 'scripts/[name].[hash].js' : 'scripts/[name].js',
     chunkFilename: isProd ? 'scripts/[id].[hash].chunk.js' : 'scripts/[id].chunk.js'
   };
+  config.resolve = {
+    extensions: ['.js', '.json', '.css', '.scss', '.html'],
+  };
   config.module = {
-    loaders: [{
-        test: /\.css$/,
-        exclude: helpers.root('src', 'views'),
-        loader: ExtractTextPlugin.extract('style', 'css!postcss')
-      },
+    rules: [
       {
         test: /\.css$/,
-        include: helpers.root('src', 'views'),
-        loader: 'raw!postcss'
+        loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader', 'postcss-loader'] })
       },
       {
         test: /\.less$/,
-        loader: ExtractTextPlugin.extract('style', 'css!postcss!less')
+        loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader', 'postcss-loader', 'less-loader'] })
       },
       {
-        test: /\.scss$/,
-        loader: ExtractTextPlugin.extract('style', 'css!postcss!sass')
+        test: /\.(scss|sass)$/,
+        loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader', 'postcss-loader', 'sass-loader'] })
       },
       {
         test: /\.html$/,
-        loader: 'html?-minimize'
+        loader: 'raw-loader'
       },
       {
         test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'file?name=fonts/[name].[hash].[ext]?'
+        loader: 'file-loader?name=fonts/[name].[hash].[ext]?'
       }
-    ],
-    postLoaders: []
+    ]
   };
   config.plugins = [
     new webpack.ProvidePlugin({
@@ -82,30 +79,36 @@ module.exports = function makeWebpackConfig() {
       template: './src/index.html',
       chunksSortMode: 'dependency'
     }),
-    new ExtractTextPlugin('styles/[name].[hash].css', {
+    new ExtractTextPlugin({
+      filename: 'styles/[name].[hash].css',
       disable: !isProd
     }), //单独使用link标签加载css并设置路径，相对于output配置中的publickPath
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        postcss: [
+          autoprefixer({
+            browsers: ['last 2 version']
+          })
+        ]
+      }
+    })
   ];
   if (isProd) {
     config.plugins.push(
       new webpack.NoErrorsPlugin(),
-      new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          warnings: false
-        }
-      })
+      new webpack.optimize.UglifyJsPlugin({ sourceMap: true, mangle: { keep_fnames: true } }),
+      new CopyWebpackPlugin([{
+        from: 'src/img',
+        to: 'img'
+      }])
     );
   }
-  config.postcss = [
-    autoprefixer({
-      browsers: ['last 2 version']
-    })
-  ];
+
   config.devServer = {
     contentBase: './src',
     historyApiFallback: true,
-    quiet: true
+    quiet: false,
+    stats: 'minimal'
   };
 
   var pages = Object.keys(helpers.getEntry('src/views/**/*.html', 'src/views/'));

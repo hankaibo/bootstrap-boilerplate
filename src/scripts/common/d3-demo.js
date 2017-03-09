@@ -1949,6 +1949,7 @@ function () {
     // .orbitColor(['#5185dd', 'red']) // 小球外切轨道的颜色，默认[]，如果不设置则使用彩虹色
     .ballNum(30) // 小球外切轨道显示多少个小球，默认12
     .ballSize([25, 35]) // 小球的半径从小到大，默认[12,24]
+    .ballUseImg(true)
     .isEquant(false) // 是否等分分布小圆，默认true
     .ballTextOutSize(14) // 小球外文字大小，默认12
     .textPathArc([2 * Math.PI * .85, 2 * Math.PI])
