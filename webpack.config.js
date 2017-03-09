@@ -12,6 +12,7 @@ var helpers = require('./helpers');
 var autoprefixer = require('autoprefixer');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 /*
  * Webpack Constants
@@ -95,7 +96,11 @@ module.exports = function makeWebpackConfig() {
   if (isProd) {
     config.plugins.push(
       new webpack.NoErrorsPlugin(),
-      new webpack.optimize.UglifyJsPlugin({ sourceMap: true, mangle: { keep_fnames: true } })
+      new webpack.optimize.UglifyJsPlugin({ sourceMap: true, mangle: { keep_fnames: true } }),
+      new CopyWebpackPlugin([{
+        from: 'src/img',
+        to: 'img'
+      }])
     );
   }
 
