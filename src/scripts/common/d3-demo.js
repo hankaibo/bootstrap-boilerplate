@@ -1,5 +1,195 @@
 var d3 = require('d3');
 
+/** chapter11 start */
+// link-constraint.html
+(function () {
+  var w = 1280;
+  var h = 800;
+  var force = d3.forceSimulation()
+    .force('charge', d3.forceManyBody().strength(-30))
+    .force('velocityDecay', function () {
+      return 0.95;
+    })
+
+  var duration = 60000;
+  var svg = d3.select('.link-constraint')
+    .append('svg:svg')
+    .attr('width', w)
+    .attr('height', h);
+
+  force.on('tick', function () {
+    svg.selectAll('circle')
+      .attr('cx', function (d) {
+        return d.x;
+      })
+      .attr('cy', function (d) {
+        return d.y;
+      });
+
+    svg.selectAll('line')
+      .attr('x1', function (d) {
+        return d.source.x;
+      })
+      .attr('y1', function (d) {
+        return d.source.y;
+      })
+      .attr('x2', function (d) {
+        return d.target.x;
+      })
+      .attr('y2', function (d) {
+        return d.target.y;
+      });
+
+    function offset() {
+      return Math.random() * 100;
+    }
+
+    function createNodes(point) {
+      var numberOfNodes = Math.round(Math.random() * 10);
+      var nodes = [];
+      for (var i = 0; i < numberOfNodes; ++i) {
+        nodes.push({
+          x: point[0] + offset(),
+          y: point[1] + offset()
+        });
+      }
+      return nodes;
+    }
+
+  })
+})();
+// momentum-and-friction.html
+(function () {
+  var w = 1280;
+  var h = 800;
+  var force = d3.forceSimulation()
+    .force('charge', d3.forceManyBody().strength(0))
+    .force('velocityDecay', function () {
+      return 0.95;
+    });
+
+  var svg = d3.select('.momentum-and-friction')
+    .append('svg:svg')
+    .attr('width', w)
+    .attr('height', h);
+  force.on('tick', function () {
+    svg.selectAll('circle')
+      .attr('cx', function (d) {
+        return d.x;
+      })
+      .attr('cy', function (d) {
+        return d.y;
+      });
+  });
+  var previousPoint;
+  svg.on('mousemove', function () {
+    var point = d3.mouse(this);
+    var node = {
+      x: point[0],
+      y: point[1],
+      px: previousPoint ? previousPoint[0] : point[0],
+      py: previousPoint ? previousPoint[1] : point[1],
+    };
+    previousPoint = point;
+
+    svg.append('svg:circle')
+      .data([node])
+      .attr('class', 'node')
+      .attr('cx', function (d) {
+        return d.x;
+      })
+      .attr('cy', function (d) {
+        return d.y;
+      })
+      .attr('r', 1e-6)
+      .transition()
+      .attr('r', 4.5)
+      .transition()
+      .delay(5000)
+      .attr('r', 1e-6)
+      .on('end', function () {
+        force.nodes().shift();
+      })
+      .remove();
+  })
+})();
+
+// gravity-and-charge.html
+(function () {
+  var w = 1280;
+  var h = 800;
+  var forceX = d3.forceX(function (d) {
+    return w
+  }).strength(0);
+
+  //strong y positioning based on row
+  var forceY = d3.forceY(function (d) {
+    return h
+  }).strength(0);
+
+  var force = d3.forceSimulation()
+    .force('x', forceX)
+    .force('y', forceY)
+    .force('center', d3.forceCenter(w / 2, h / 2))
+    .force('charge', d3.forceManyBody().strength(0))
+    .force('velocityDecay', function () {
+      return 0.7;
+    });
+  var svg = d3.select('.gravity-and-charge')
+    .append('svg')
+    .attr('width', w)
+    .attr('height', h);
+  force.on('tick', function () {
+    console.log(svg.select('circle'));
+    svg.selectAll('circle')
+      .attr('cx', function (d) {
+        return d.x;
+      })
+      .attr('cy', function (d) {
+        return d.y;
+      })
+  });
+  svg.on('mousemove', function () {
+    var point = d3.mouse(this);
+    var node = {
+      x: point[0],
+      y: point[1]
+    };
+    svg.append('circle')
+      .data([node])
+      .attr('class', 'node')
+      .attr('cx', function (d) {
+        return d.x;
+      })
+      .attr('cy', function (d) {
+        return d.y;
+      })
+      .attr('r', 1e-6)
+      .transition()
+      // .on('start', function () {
+      //   d3.active(this)
+      .attr('r', 4.5)
+      .transition()
+      .delay(7000)
+      .attr('r', 1e-6)
+      .on('end', function () {
+        force.nodes().shift();
+      })
+      // })
+      .remove();
+    force.nodes().push(node);
+    force.restart();
+  });
+
+  function changeForce(charge, gravity) {
+    force
+      .force('charge', d3.forceManyBody().strength(charge))
+      .force('x', d3.forceX().strength(gravity))
+      .force('y', d3.forceY().strength(gravity));
+  }
+});
+/** chapter11 end */
+
 // custom-interpolator.html
 (function () {
   d3.interpolate(function (a, b) {
@@ -992,6 +1182,270 @@ function () {
 })();
 
 // ===================other====================
+/** d3-foo */
+(function () {
+  // some colour variables
+  var tcBlack = '#130C0E';
+
+  // rest of vars
+  var w = 960,
+    h = 800,
+    maxNodeSize = 50,
+    x_browser = 20,
+    y_browser = 25,
+    root;
+
+  var vis;
+  var force = d3.forceSimulation();
+
+  vis = d3.select('.d3-foo')
+    .attr("width", w)
+    .attr("height", h);
+
+  d3.json("/scripts/data/marvel.json", function (json) {
+
+    root = json;
+    root.fixed = true;
+    root.x = w / 2;
+    root.y = h / 4;
+
+
+    // Build the path
+    var defs = vis.insert("svg:defs")
+      .data(["end"]);
+
+
+    defs.enter().append("svg:path")
+      .attr("d", "M0,-5L10,0L0,5");
+
+    update();
+  });
+
+
+  /**
+   *
+   */
+  function update() {
+    var nodes = flatten(root),
+      links = d3.hierarchy(root).links(nodes);
+
+    // Restart the force layout.
+    force.nodes(nodes)
+      // .force(links)
+      .force("charge", d3.forceManyBody().strength(-1500))
+      // .linkDistance(100)
+      .force('velocityDecay', function () {
+        return 0.5;
+      })
+      // .linkStrength(function (l, i) { return 1; })
+      .force("link", d3.forceLink().id(function (d) {
+        return d.id;
+      }))
+      .force('x', d3.forceX(function (d) {
+        return h
+      }).strength(0.05))
+      .force('y', d3.forceY(function (d) {
+        return h
+      }).strength(0.05))
+      .on("tick", tick)
+      .restart();
+
+    var path = vis.selectAll("path.link")
+      .data(links, function (d) {
+        return d.target.id;
+      });
+
+    path.enter()
+      .insert("svg:path")
+      .attr("class", "link")
+      // .attr("marker-end", "url(#end)")
+      .style("stroke", "#eee");
+
+
+    // Exit any old paths.
+    path.exit().remove();
+
+
+
+    // Update the nodes…
+    var node = vis.selectAll("g.node")
+      .data(nodes, function (d) {
+        return d.id;
+      });
+
+
+    // Enter any new nodes.
+    var nodeEnter = node.enter()
+      .append("svg:g")
+      .attr("class", "node")
+      .attr("transform", function (d) {
+        return "translate(" + d.x + "," + d.y + ")";
+      })
+      .on("click", click)
+      .call(d3.drag()
+        // .on("start", dragstarted)
+        .on("drag", dragged)
+        // .on("end", dragended)
+      );
+
+    // Append a circle
+    nodeEnter.append("svg:circle")
+      .attr("r", function (d) {
+        return Math.sqrt(d.size) / 10 || 4.5;
+      })
+      .style("fill", "#eee");
+
+
+    // Append images
+    var images = nodeEnter.append("svg:image")
+      .attr("xlink:href", function (d) {
+        return d.img;
+      })
+      .attr("x", function (d) {
+        return -25;
+      })
+      .attr("y", function (d) {
+        return -25;
+      })
+      .attr("height", 50)
+      .attr("width", 50);
+
+    // make the image grow a little on mouse over and add the text details on click
+    var setEvents = images
+      // Append hero text
+      .on('click', function (d) {
+        d3.select("h1").html(d.hero);
+        d3.select("h2").html(d.name);
+        d3.select("h3").html("Take me to " + "<a href='" + d.link + "' >" + d.hero + " web page ⇢" + "</a>");
+      })
+
+      .on('mouseenter', function () {
+        // select element in current context
+        d3.select(this)
+          .transition()
+          .attr("x", function (d) {
+            return -60;
+          })
+          .attr("y", function (d) {
+            return -60;
+          })
+          .attr("height", 100)
+          .attr("width", 100);
+      })
+      // set back
+      .on('mouseleave', function () {
+        d3.select(this)
+          .transition()
+          .attr("x", function (d) {
+            return -25;
+          })
+          .attr("y", function (d) {
+            return -25;
+          })
+          .attr("height", 50)
+          .attr("width", 50);
+      });
+
+    // Append hero name on roll over next to the node as well
+    nodeEnter.append("text")
+      .attr("class", "nodetext")
+      .attr("x", x_browser)
+      .attr("y", y_browser + 15)
+      .attr("fill", tcBlack)
+      .text(function (d) {
+        return d.hero;
+      });
+
+
+    // Exit any old nodes.
+    node.exit().remove();
+
+
+    // Re-select for update.
+    path = vis.selectAll("path.link");
+    node = vis.selectAll("g.node");
+
+    function tick() {
+
+
+      path.attr("d", function (d) {
+
+        var dx = d.target.x - d.source.x,
+          dy = d.target.y - d.source.y,
+          dr = Math.sqrt(dx * dx + dy * dy);
+        return "M" + d.source.x + "," +
+          d.source.y +
+          "A" + dr + "," +
+          dr + " 0 0,1 " +
+          d.target.x + "," +
+          d.target.y;
+      });
+      node.attr("transform", nodeTransform);
+    }
+  }
+
+
+  /**
+   * Gives the coordinates of the border for keeping the nodes inside a frame
+   * http://bl.ocks.org/mbostock/1129492
+   */
+  function nodeTransform(d) {
+    d.x = Math.max(maxNodeSize, Math.min(w - (d.imgwidth / 2 || 16), d.x));
+    d.y = Math.max(maxNodeSize, Math.min(h - (d.imgheight / 2 || 16), d.y));
+    return "translate(" + d.x + "," + d.y + ")";
+  }
+
+  /**
+   * Toggle children on click.
+   */
+  function click(d) {
+    if (d.children) {
+      d._children = d.children;
+      d.children = null;
+    } else {
+      d.children = d._children;
+      d._children = null;
+    }
+
+    update();
+  }
+
+
+  /**
+   * Returns a list of all nodes under the root.
+   */
+  function flatten(root) {
+    var nodes = [];
+    var i = 0;
+
+    function recurse(node) {
+      if (node.children)
+        node.children.forEach(recurse);
+      if (!node.id)
+        node.id = ++i;
+      nodes.push(node);
+    }
+
+    recurse(root);
+    return nodes;
+  }
+
+  function dragstarted(d) {
+    if (!d3.event.active) force.alphaTarget(0.3).restart()
+    force.fix(d);
+  }
+
+  function dragged(d) {
+    force.fix(d, d3.event.x, d3.event.y);
+  }
+
+  function dragended(d) {
+    if (!d3.event.active) force.alphaTarget(0);
+    force.unfix(d);
+  }
+
+})();
+
 /** d3-dashboard.js demo */
 (function () {
   var dashboard = require('./d3-dashboard');
@@ -1944,11 +2398,11 @@ function () {
 
   var circle1 = ringSingle()
     .value(value.slice(0, 30)) // 小球数据，默认无
-    // .isClockwise(false)
-    .orbitWidth(1) // 小球外切轨道的宽度，默认1
+    .isClockwise(true)
+    .orbitWidth(0) // 小球外切轨道的宽度，默认1
     // .orbitColor(['#5185dd', 'red']) // 小球外切轨道的颜色，默认[]，如果不设置则使用彩虹色
-    .ballNum(30) // 小球外切轨道显示多少个小球，默认12
-    .ballSize([25, 35]) // 小球的半径从小到大，默认[12,24]
+    .ballNum(36) // 小球外切轨道显示多少个小球，默认12
+    .ballSize([12, 24]) // 小球的半径从小到大，默认[12,24]
     .ballUseImg(true)
     .isEquant(false) // 是否等分分布小圆，默认true
     .ballTextOutSize(14) // 小球外文字大小，默认12
@@ -1970,10 +2424,10 @@ function () {
     .orbitEndAngle(Math.PI) // 小球外切轨道结束弧度，默认为2*Math.PI
     .transitonTime(1000) // 小球外切轨道动画时间，单位毫秒，默认1s
     .ballNum(30) // 小球外切轨道显示多少个小球，默认12
-    .ballSize([15, 35]) // 小球的半径从小到大，默认[12,24]
+    .ballSize([15, 25]) // 小球的半径从小到大，默认[12,24]
     .isEquant(false) // 是否等分分布小圆，默认true
     .ballTextOutSize(14) // 小球外文字大小，默认12
-    .ballUseImg(true) // 是否使用图片，默认false
+    .ballUseImg(false) // 是否使用图片，默认false
     .firstQuadrantDominantBaseline('text-before-edge') // 第一象限文字基线，默认值'text-before-edge'
     .firstQuadrantTextAnchor('end') // 第一象限文字起点，默认值'end'
     .secondQuadrantDominantBaseline('text-after-edge') // 第二象限文字基线，默认值'text-after-edge'
