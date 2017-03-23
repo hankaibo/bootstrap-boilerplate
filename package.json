@@ -24,6 +24,7 @@
     "bootstrap": "^3.3.7",
     "bootstrap-social": "^5.0.0",
     "d3": "^4.3.0",
+    "d3-tip": "^0.7.1",
     "datatables": "^1.10.12",
     "datatables-bootstrap": "0.0.1",
     "datatables-responsive": "^1.0.7",

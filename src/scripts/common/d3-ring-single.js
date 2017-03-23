@@ -2,6 +2,8 @@
  * This is a pure D3.js ring-single inspired by the http://bl.ocks.org/clayzermk1/9142407, http://bl.ocks.org/mbostock/4063269 and http://bl.ocks.org/mbostock/45943c4af772e38b4f4e .
  */
 var d3 = require('d3');
+var tip = require('d3-tip');
+d3.tip = tip;
 exports = module.exports = function () {
   'use strict';
   // Public variables with default settings
@@ -22,6 +24,7 @@ exports = module.exports = function () {
   var isEquant = true;
   var ballTextOutSize = 12;
   var ballUseImg = false;
+  var ballZoom = 2;
   // 小圆球文字相关属性
   var firstQuadrantDominantBaseline = 'text-before-edge';
   var firstQuadrantTextAnchor = 'end';
@@ -66,7 +69,7 @@ exports = module.exports = function () {
 
   function chart(selection) {
     selection.each(function () {
-      var svg = d3.select('svg');
+      var svg = d3.select(this);
       var width = +svg.attr('width');
       var height = +svg.attr('height');
       var radius = Math.min(width, height);
@@ -74,6 +77,14 @@ exports = module.exports = function () {
         'earthOrbit': radius / 3,
         'rectArea': Math.sqrt(Math.pow(radius * .8, 2) / 2)
       };
+      // 提示框
+      var tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .html(function (d) {
+          return '<p>' + d.name + '</p>';
+        });
+      svg.call(tip);
+
       // 轨道颜色比例尺
       var orbitColorScale = d3.scaleLinear()
         .domain([0, ballNum])
@@ -135,7 +146,6 @@ exports = module.exports = function () {
           .attr('startOffset', textBeforeEdgeStartOffset)
           .attr('dominant-baseline', textBeforeEdgeDominantBaseline)
           .text(textBeforeEdge);
-
       }
 
       /**
@@ -151,8 +161,7 @@ exports = module.exports = function () {
           .attr('class', 'node')
           .attr('id', function (d) {
             return 'g_circle_' + d.id
-          })
-          .attr('opacity', .8);
+          });
 
         dom.selectAll('g.node')
           .data(value)
@@ -168,9 +177,26 @@ exports = module.exports = function () {
           })
           .attr('r', function (d, i) {
             return ballSizeScale(i);
-          });
+          })
+          .attr('fill', 'transparent');
 
         if (ballUseImg) {
+          nodeData.append('image')
+            .attr('xlink:href', function (d) {
+              return d.img;
+            })
+            .attr('x', function (d, i) {
+              return -ballSizeScale(i);
+            })
+            .attr('y', function (d, i) {
+              return -ballSizeScale(i);
+            })
+            .attr('height', function (d, i) {
+              return ballSizeScale(i) * 2;
+            })
+            .attr('width', function (d, i) {
+              return ballSizeScale(i) * 2;
+            });
           nodeData.append('text')
             .attr('class', 'node-text-out')
             .attr('x', 0)
@@ -225,6 +251,80 @@ exports = module.exports = function () {
         }
 
         nodeData.each(function (d, i) {
+          // 过渡效果
+          d3.select(this).on('mouseenter', function () {
+              d3.select(this)
+                .select('image')
+                .transition()
+                .attr('x', function (d) {
+                  return -(d3.select(this).attr('width'));
+                })
+                .attr('y', function () {
+                  return -(d3.select(this).attr('height'));
+                })
+                .attr('height', function () {
+                  return d3.select(this).attr('height') * ballZoom;
+                })
+                .attr('width', function () {
+                  return d3.select(this).attr('width') * ballZoom;
+                });
+              d3.select(this)
+                .select('circle')
+                .transition()
+                .attr('r', function () {
+                  return d3.select(this).attr('r') * ballZoom;
+                });
+            })
+            .on('mouseleave', function () {
+              d3.select(this)
+                .select('image')
+                .transition()
+                .attr('x', function (d) {
+                  return -ballSizeScale(i);
+                })
+                .attr('y', function (d) {
+                  return -ballSizeScale(i);
+                })
+                .attr('height', function () {
+                  return ballSizeScale(i) * 2;
+                })
+                .attr('width', function () {
+                  return ballSizeScale(i) * 2;
+                });
+              d3.select(this)
+                .select('circle')
+                .transition()
+                .attr('r', function () {
+                  return ballSizeScale(i);
+                });
+            });
+          // 提示框效果
+          d3.select(this)
+            .on('mouseenter.tip', tip.show)
+            .on('mouseleave.tip', tip.hide);
+          // 事件
+          d3.select(this).on('click', function (d) {
+            svg.select('.sun')
+              .attr('fill', function () {
+                var defs = svg.append('defs')
+                  .attr('id', 'imgdefs');
+                var catpattern = defs.append('pattern')
+                  .attr('id', 'catpattern' + d.id)
+                  .attr('height', 1)
+                  .attr('width', 1);
+                catpattern.append('image')
+                  .attr('x', '0')
+                  .attr('y', '0')
+                  .attr('width', radii.rectArea)
+                  .attr('height', radii.rectArea)
+                  .attr('xlink:href', function () {
+                    return d.img;
+                  });
+
+                return 'url(#catpattern' + d.id + ')';
+              });
+          })
+
           if (isEquant) {
             hudu = tau * (i / ballNum);
           } else {
@@ -238,30 +338,14 @@ exports = module.exports = function () {
               hudu += Math.acos(cosc);
             }
           }
-          if (ballUseImg) {
-            d3.select(this).select('.node-circle')
-              .style('fill', function () {
-                var defs = svg.append('defs')
-                  .attr('id', 'imgdefs' + 0);
-                var pattern = defs.append('pattern')
-                  .attr('id', 'pattern' + i)
-                  .attr('height', 1)
-                  .attr('width', 1);
-                pattern.append('image')
-                  .attr('x', '0')
-                  .attr('y', '0')
-                  .attr('width', ballSizeScale(i) * 2)
-                  .attr('height', ballSizeScale(i) * 2)
-                  .attr('xlink:href', d.img);
 
-                return 'url(#pattern' + i + ')';
-              });
-          } else {
+          if (!ballUseImg) {
             d3.select(this).select('.node-circle')
               .style('fill', function () {
                 return orbitRainbow ? d3.hsl(hudu * 180 / PI, 1, .5) : orbitColorScale(i);
               });
           }
+
           X = Math.sin(isClockwise ? hudu : (tau - hudu)) * (radii.earthOrbit + ballSizeScale(i));
           Y = Math.cos(isClockwise ? hudu : (tau - hudu)) * (radii.earthOrbit + ballSizeScale(i));
           d3.select(this).attr('transform', 'translate(' + X + ',' + -Y + ')');
@@ -271,11 +355,9 @@ exports = module.exports = function () {
             .attr('transform', 'translate(' + x + ',' + y + ')');
           // setTextOfcircle(nodeTextOut, acos);
           setTextOfcircle(nodeTextOut, isClockwise ? hudu : (tau - hudu));
-
         });
 
         dom.selectAll('g.node').each(function (d, i) {
-          // console.log(d3.select(this).attr('id'));
           d3.select(this).append('animate')
             .attr('attributeName', 'opacity')
             .attr('values', '1')
@@ -364,23 +446,7 @@ exports = module.exports = function () {
         dom.append('g')
           .append('circle')
           .attr('class', 'sun')
-          .attr('r', radii.rectArea / 2)
-          .attr('fill', function (d, i) {
-            var defs = svg.append('defs')
-              .attr('id', 'imgdefs');
-            var catpattern = defs.append('pattern')
-              .attr('id', 'catpattern' + i)
-              .attr('height', 1)
-              .attr('width', 1);
-            catpattern.append('image')
-              .attr('x', '0')
-              .attr('y', '0')
-              .attr('width', radii.rectArea)
-              .attr('height', radii.rectArea)
-              .attr('xlink:href', '/img/Nowitzki.jpg');
-
-            return 'url(#catpattern' + i + ')';
-          });
+          .attr('r', radii.rectArea / 2);
       }
 
     });
@@ -478,6 +544,13 @@ exports = module.exports = function () {
       return ballUseImg;
     }
     ballUseImg = _;
+    return chart;
+  };
+  chart.ballZoom = function (_) {
+    if (!arguments.length) {
+      return ballZoom;
+    }
+    ballZoom = _;
     return chart;
   };
   chart.firstQuadrantDominantBaseline = function (_) {
