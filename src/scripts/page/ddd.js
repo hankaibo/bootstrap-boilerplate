@@ -15,4 +15,4 @@ require('jquery');
 require('bootstrap');
 require('metisMenu');
 require('../common/sb-admin-2.js');
-require('../common/d3-demo.js');
+// require('../common/d3-demo.js');
