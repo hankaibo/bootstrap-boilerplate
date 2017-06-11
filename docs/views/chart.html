@@ -9,16 +9,16 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>通知</title>
+  <title>图表</title>
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-  <![endif]-->
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 
-<link rel="shortcut icon" href="../bootstrap_64px.ico"><link href="../styles/vendors.0d908b95a82ead57eedc.css?0d908b95a82ead57eedc" rel="stylesheet"><link href="../styles/notifications.0d908b95a82ead57eedc.css?0d908b95a82ead57eedc" rel="stylesheet"></head>
+<link rel="shortcut icon" href="../bootstrap_64px.ico"><link href="../styles/vendors.0d908b95a82ead57eedc.css?0d908b95a82ead57eedc" rel="stylesheet"><link href="../styles/chart.0d908b95a82ead57eedc.css?0d908b95a82ead57eedc" rel="stylesheet"></head>
 
 <body>
 
@@ -259,16 +259,16 @@
               <!-- /input-group -->
             </li>
             <li>
-              <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> 仪表盘</a>
+              <a href="index.html"><i class="fa fa-dashboard fa-fw"></i>仪表盘</a>
             </li>
-            <li>
-              <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i>  图表<span class="fa arrow"></span></a>
+            <li class="active">
+              <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i>图表<span class="fa arrow"></span></a>
               <ul class="nav nav-second-level">
                 <li>
                   <a href="ddd.html">ddd</a>
                 </li>
                 <li>
-                  <a href="chart.html">chart.js</a>
+                  <a class="active" href="chart.html">morris.js</a>
                 </li>
               </ul>
               <!-- /.nav-second-level -->
@@ -355,7 +355,7 @@
     <div id="page-wrapper">
       <div class="row">
         <div class="col-lg-12">
-          <h1 class="page-header">Notifications</h1>
+          <h1 class="page-header">chart.js</h1>
         </div>
         <!-- /.col-lg-12 -->
       </div>
@@ -364,24 +364,13 @@
         <div class="col-lg-6">
           <div class="panel panel-default">
             <div class="panel-heading">
-              Alert Styles
+              Area Chart Example
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body">
-              <div class="alert alert-success">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. <a href="#" class="alert-link">Alert Link</a>.
-              </div>
-              <div class="alert alert-info">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. <a href="#" class="alert-link">Alert Link</a>.
-              </div>
-              <div class="alert alert-warning">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. <a href="#" class="alert-link">Alert Link</a>.
-              </div>
-              <div class="alert alert-danger">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. <a href="#" class="alert-link">Alert Link</a>.
-              </div>
+              <canvas id="area-chart"></canvas>
             </div>
-            <!-- .panel-body -->
+            <!-- /.panel-body -->
           </div>
           <!-- /.panel -->
         </div>
@@ -389,73 +378,13 @@
         <div class="col-lg-6">
           <div class="panel panel-default">
             <div class="panel-heading">
-              Dismissable Alerts
+              Bar Chart Example
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body">
-              <div class="alert alert-success alert-dismissable">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> Lorem ipsum
-                dolor sit amet, consectetur adipisicing elit. <a href="#" class="alert-link">Alert Link</a>.
-              </div>
-              <div class="alert alert-info alert-dismissable">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> Lorem ipsum
-                dolor sit amet, consectetur adipisicing elit. <a href="#" class="alert-link">Alert Link</a>.
-              </div>
-              <div class="alert alert-warning alert-dismissable">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> Lorem ipsum
-                dolor sit amet, consectetur adipisicing elit. <a href="#" class="alert-link">Alert Link</a>.
-              </div>
-              <div class="alert alert-danger alert-dismissable">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> Lorem ipsum
-                dolor sit amet, consectetur adipisicing elit. <a href="#" class="alert-link">Alert Link</a>.
-              </div>
+              <canvas id="bar-chart"></canvas>
             </div>
-            <!-- .panel-body -->
-          </div>
-          <!-- /.panel -->
-        </div>
-        <!-- /.col-lg-6 -->
-      </div>
-      <!-- /.row -->
-      <div class="row">
-        <div class="col-lg-6">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              Modals
-            </div>
-            <!-- /.panel-heading -->
-            <div class="panel-body">
-              <!-- Button trigger modal -->
-              <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-                Launch Demo Modal
-              </button>
-              <!-- Modal -->
-              <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                      <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-                    </div>
-                    <div class="modal-body">
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                      Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-                      laborum.
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                      <button type="button" class="btn btn-primary">Save changes</button>
-                    </div>
-                  </div>
-                  <!-- /.modal-content -->
-                </div>
-                <!-- /.modal-dialog -->
-              </div>
-              <!-- /.modal -->
-            </div>
-            <!-- .panel-body -->
+            <!-- /.panel-body -->
           </div>
           <!-- /.panel -->
         </div>
@@ -463,35 +392,42 @@
         <div class="col-lg-6">
           <div class="panel panel-default">
             <div class="panel-heading">
-              Tooltips and Popovers
+              Line Chart Example
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body">
-              <h4>Tooltip Demo</h4>
-              <div class="tooltip-demo">
-                <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Tooltip on left">Tooltip on left</button>
-                <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Tooltip on top">Tooltip on top</button>
-                <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom">Tooltip on bottom</button>
-                <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="right" title="Tooltip on right">Tooltip on right</button>
-              </div>
-              <br>
-              <h4>Clickable Popover Demo</h4>
-              <div class="tooltip-demo">
-                <button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="left" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">
-                  Popover on left
-                </button>
-                <button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">
-                  Popover on top
-                </button>
-                <button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">
-                  Popover on bottom
-                </button>
-                <button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">
-                  Popover on right
-                </button>
-              </div>
+              <canvas id="line-chart"></canvas>
             </div>
-            <!-- .panel-body -->
+            <!-- /.panel-body -->
+          </div>
+          <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-6 -->
+        <div class="col-lg-6">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              Donut Chart Example
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+              <canvas id="donut-chart"></canvas>
+            </div>
+            <!-- /.panel-body -->
+          </div>
+          <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-6 -->
+        <div class="col-lg-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              Chart.js Usage
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+              <p>Simple yet flexible JavaScript charting for designers & developers.<a target="_blank" href="http://www.chartjs.org/">http://www.chartjs.org/</a>.</p>
+              <a target="_blank" class="btn btn-default btn-lg btn-block" href="http://www.chartjs.org/docs/latest/">View Chart.js Documentation</a>
+            </div>
+            <!-- /.panel-body -->
           </div>
           <!-- /.panel -->
         </div>
@@ -504,6 +440,6 @@
   </div>
   <!-- /#wrapper -->
 
-<script type="text/javascript" src="../scripts/vendors.0d908b95a82ead57eedc.js?0d908b95a82ead57eedc"></script><script type="text/javascript" src="../scripts/notifications.0d908b95a82ead57eedc.js?0d908b95a82ead57eedc"></script></body>
+<script type="text/javascript" src="../scripts/vendors.0d908b95a82ead57eedc.js?0d908b95a82ead57eedc"></script><script type="text/javascript" src="../scripts/chart.0d908b95a82ead57eedc.js?0d908b95a82ead57eedc"></script></body>
 
 </html>
