@@ -9,9 +9,11 @@ function root(args) {
   args = Array.prototype.slice.call(arguments, 0);
   return path.join.apply(path, [__dirname].concat(args));
 }
+
 function getEntry(globPath, pathDir) {
   var files = glob.sync(globPath);
-  var entries = {}, entry, dirname, basename, pathname, extname, clonepathname;
+  var entries = {},
+    entry, dirname, basename, pathname, extname, clonepathname;
   var re = /\\/gi;
 
   for (var i = 0; i < files.length; i++) {

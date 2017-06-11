@@ -22,5 +22,4 @@ $('.tooltip-demo').tooltip({
 })
 
 // popover demo
-$('[data-toggle=popover]')
-  .popover()
+$('[data-toggle=popover]').popover()

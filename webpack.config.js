@@ -41,18 +41,26 @@ module.exports = function makeWebpackConfig() {
     extensions: ['.js', '.json', '.css', '.scss', '.html'],
   };
   config.module = {
-    rules: [
-      {
+    rules: [{
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader', 'postcss-loader'] })
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'postcss-loader']
+        })
       },
       {
         test: /\.less$/,
-        loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader', 'postcss-loader', 'less-loader'] })
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'postcss-loader', 'less-loader']
+        })
       },
       {
         test: /\.(scss|sass)$/,
-        loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader', 'postcss-loader', 'sass-loader'] })
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'postcss-loader', 'sass-loader']
+        })
       },
       {
         test: /\.html$/,
@@ -96,7 +104,12 @@ module.exports = function makeWebpackConfig() {
   if (isProd) {
     config.plugins.push(
       new webpack.NoErrorsPlugin(),
-      new webpack.optimize.UglifyJsPlugin({ sourceMap: true, mangle: { keep_fnames: true } }),
+      new webpack.optimize.UglifyJsPlugin({
+        sourceMap: true,
+        mangle: {
+          keep_fnames: true
+        }
+      }),
       new CopyWebpackPlugin([{
         from: 'src/img',
         to: 'img'
